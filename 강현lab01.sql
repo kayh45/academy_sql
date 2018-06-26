@@ -172,4 +172,99 @@ SELECT e.EMPNO AS "사번"
 7902	FORD	20
 */
 
+-- 실습 9)
+SELECT e.EMPNO  AS "사번"
+     , e.ENAME  AS "이름"
+     , e.SAL    AS "급여"
+     , e.DEPTNO AS "부서번호"
+  FROM emp e
+ WHERE e.DEPTNO = 20
+   AND e.SAL < 3000
+;
+/*
+사번     이름   급여  부서번호
+-----------------------------
+7369	SMITH	800	    20
+7566	JONES	2975	20
+*/
 
+
+-- 실습 10)
+SELECT e.EMPNO        AS "사번"
+     , e.ENAME        AS "이름"
+     , e.SAL + e.COMM AS "급여+커미션"
+  FROM emp e
+;
+/*
+사번     이름  급여+커미션
+-------------------------
+7369	SMITH	
+7499	ALLEN	1900
+7521	WARD	1750
+7566	JONES	
+7654	MARTIN	2650
+7698	BLAKE	
+7782	CLARK	
+7839	KING	
+7844	TURNER	1500
+7900	JAMES	
+7902	FORD	
+7934	MILLER	
+*/
+
+
+-- 실습 11)
+SELECT e.EMPNO        AS "사번"
+     , e.ENAME        AS "이름"
+     , e.SAL * 12     AS "년급여"
+  FROM emp e
+;
+/*
+사번    이름    년급여
+----------------------
+7369	SMITH	9600
+7499	ALLEN	19200
+7521	WARD	15000
+7566	JONES	35700
+7654	MARTIN	15000
+7698	BLAKE	34200
+7782	CLARK	29400
+7839	KING	60000
+7844	TURNER	18000
+7900	JAMES	11400
+7902	FORD	36000
+7934	MILLER	15600
+*/
+
+
+-- 실습 12)
+SELECT e.EMPNO AS 사번
+     , e.ENAME AS 이름
+     , e.JOB   AS 직책
+     , e.SAL   AS 급여
+     , e.COMM  AS 커미션
+  FROM emp e
+ WHERE e.ENAME = 'MARTIN'
+    OR e.ENAME = 'BLAKE'
+;
+/*
+사번     이름      직책      급여    커미션
+7654	MARTIN	SALESMAN	1250	1400
+7698	BLAKE	MANAGER	    2850	
+*/
+
+
+-- 실습 13)
+SELECT e.EMPNO AS "사번"
+     , e.ENAME AS "이름"
+     , e.JOB   AS "직책"
+     , e.SAL + e.COMM   AS "급여+커미션"
+  FROM emp e
+ WHERE e.ENAME = 'MARTIN'
+    OR e.ENAME = 'BLAKE'
+;
+/*
+사번     이름     직책    급여+커미션
+7654	MARTIN	SALESMAN	2650
+7698	BLAKE	MANAGER	
+*/

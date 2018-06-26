@@ -245,3 +245,53 @@ MANAGER
 CLERK
 ANALYST
 */
+
+-- (5) WHERE 조건절
+--  16) emp 테이블에서 empno이 7900인 사원의
+--      사번, 이름, 직무, 입사일, 급여, 부서번호
+SELECT e.EMPNO    AS 사번
+     , e.ENAME    AS 이름
+     , e.JOB      AS 직무
+     , e.HIREDATE AS 입사일
+     , e.SAL      AS 급여
+     , e.DEPTNO   AS 부서번호
+  FROM emp e
+ WHERE e.EMPNO = 7900
+;
+/*
+사번     이름    직무     입사일     급여  부서번호
+-------------------------------------------------
+7900	JAMES	CLERK	81/12/03	950	    30
+*/
+
+--  17) emp 테이블에서 empno는 7900이거나 deptno가 20인 직원의 정보를
+--      사번, 이름, 직무, 입사일, 급여, 부서번호만 조회
+SELECT e.EMPNO    AS 사번
+     , e.ENAME    AS 이름
+     , e.JOB      AS 직무
+     , e.HIREDATE AS 입사일
+     , e.SAL      AS 급여
+     , e.DEPTNO   AS 부서번호
+  FROM emp e
+ WHERE e.EMPNO = 7900
+    OR e.DEPTNO = 20
+;
+/*
+사번     이름    직무     입사일     급여  부서번호
+-------------------------------------------------
+7369	SMITH	CLERK	80/12/17	800	    20
+7566	JONES	MANAGER	81/04/02	2975	20
+7900	JAMES	CLERK	81/12/03	950	    30
+7902	FORD	ANALYST	81/12/03	3000	20
+*/
+SELECT e.EMPNO    AS 사번
+     , e.ENAME    AS 이름
+     , e.JOB      AS 직무
+     , e.HIREDATE AS 입사일
+     , e.SAL      AS 급여
+     , e.DEPTNO   AS 부서번호
+  FROM emp e
+ WHERE e.EMPNO = 7900
+   AND e.DEPTNO = 20
+;
+-- 인출된 모든 행 : 0
