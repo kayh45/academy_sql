@@ -269,3 +269,154 @@ SELECT e.EMPNO AS "사번"
 7654	MARTIN	SALESMAN	2650
 7698	BLAKE	MANAGER	
 */
+
+
+-- 실습 14) 
+SELECT *
+  FROM emp e
+ WHERE e.COMM != 0
+; --- (1)
+
+SELECT *
+  FROM emp e
+ WHERE e.COMM <> 0
+; --- (2)
+
+SELECT *
+  FROM emp e
+ WHERE NOT e.COMM = 0
+; --- (3)
+
+/*
+EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
+---------------------------------------------------------------------
+7499	ALLEN	SALESMAN	7698	81/02/20	1600	300	    30
+7521	WARD	SALESMAN	7698	81/02/22	1250	500	    30
+7654	MARTIN	SALESMAN	7698	81/09/28	1250	1400	30
+*/
+
+
+-- 실습 15)
+SELECT *
+  FROM emp e
+ WHERE e.COMM IS NOT NULL
+;
+
+/*
+EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
+---------------------------------------------------------------------
+7499	ALLEN	SALESMAN	7698	81/02/20	1600	300	    30
+7521	WARD	SALESMAN	7698	81/02/22	1250	500	    30
+7654	MARTIN	SALESMAN	7698	81/09/28	1250	1400	30
+7844	TURNER	SALESMAN	7698	81/09/08	1500	0	    30
+*/
+
+
+-- 실습 16)
+SELECT *
+  FROM emp e
+ WHERE e.DEPTNO = 20
+   AND e.SAL > 2500
+;
+/*
+EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
+---------------------------------------------------------------------
+7566	JONES	MANAGER	    7839	81/04/02	2975		    20
+7902	FORD	ANALYST	    7566	81/12/03	3000		    20
+*/
+
+
+-- 실습 17)
+SELECT * 
+  FROM emp e
+ WHERE e.JOB = 'MANAGER'
+    OR e.DEPTNO = 10
+;
+/*
+EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
+---------------------------------------------------------------------
+7566	JONES	MANAGER	    7839	81/04/02	2975		20
+7698	BLAKE	MANAGER	    7839	81/05/01	2850		30
+7782	CLARK	MANAGER	    7839	81/06/09	2450		10
+7839	KING	PRESIDENT		    81/11/17	5000		10
+7934	MILLER	CLERK	    7782	82/01/23	1300		10
+*/
+
+
+-- 실습 18)
+SELECT * 
+  FROM emp e
+ WHERE e.JOB IN ('MANAGER', 'CLERK', 'SALESMAN')
+;
+/*
+EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
+---------------------------------------------------------------------
+7369	SMITH	CLERK	    7902	80/12/17	800		        20
+7499	ALLEN	SALESMAN	7698	81/02/20	1600	300	    30
+7521	WARD	SALESMAN	7698	81/02/22	1250	500	    30
+7566	JONES	MANAGER	    7839	81/04/02	2975		    20
+7654	MARTIN	SALESMAN	7698	81/09/28	1250	1400	30
+7698	BLAKE	MANAGER	    7839	81/05/01	2850		    30
+7782	CLARK	MANAGER	    7839	81/06/09	2450		    10
+7844	TURNER	SALESMAN	7698	81/09/08	1500	0	    30
+7900	JAMES	CLERK	    7698	81/12/03	950		        30
+7934	MILLER	CLERK	    7782	82/01/23	1300		    10
+*/
+
+
+-- 실습 19)
+SELECT *
+  FROM emp e
+ WHERE e.ENAME LIKE 'A%'
+;
+/*
+EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
+---------------------------------------------------------------------
+7499	ALLEN	SALESMAN	7698	81/02/20	1600	300	    30
+*/
+
+
+-- 실습 20)
+SELECT *
+  FROM emp e
+ WHERE e.ENAME LIKE '%A%'
+;
+/*
+EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
+---------------------------------------------------------------------
+7499	ALLEN	SALESMAN	7698	81/02/20	1600	300	    30
+7521	WARD	SALESMAN	7698	81/02/22	1250	500	    30
+7654	MARTIN	SALESMAN	7698	81/09/28	1250	1400	30
+7698	BLAKE	MANAGER	    7839	81/05/01	2850		    30
+7782	CLARK	MANAGER	    7839	81/06/09	2450		    10
+7900	JAMES	CLERK	    7698	81/12/03	950		        30
+*/
+
+
+-- 실습 21)
+SELECT *
+  FROM emp e
+ WHERE e.ENAME LIKE '%S'
+;
+/*
+EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
+---------------------------------------------------------------------
+7566	JONES	MANAGER	    7839	81/04/02	2975		    20
+7900	JAMES	CLERK	    7698	81/12/03	950		        30
+*/
+
+
+-- 실습 22)
+SELECT *
+  FROM emp e
+ WHERE e.ENAME LIKE '%E_'
+;
+/*
+EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
+---------------------------------------------------------------------
+7499	ALLEN	SALESMAN	7698	81/02/20	1600	300	    30
+7566	JONES	MANAGER	    7839	81/04/02	2975		    20
+7844	TURNER	SALESMAN	7698	81/09/08	1500	0	    30
+7900	JAMES	CLERK	    7698	81/12/03	950		        30
+7934	MILLER	CLERK	    7782	82/01/23	1300		    10
+*/

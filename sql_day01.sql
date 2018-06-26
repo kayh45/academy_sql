@@ -381,3 +381,134 @@ SELECT e.EMPNO
  WHERE e.SAL >= 1000
    AND e.SAL < 2000
 ;
+
+--- comm값이 0보다 큰 직원의 사번, 이름, 급여를 조회
+SELECT e.EMPNO
+     , e.ENAME
+     , e.SAL
+     , e.COMM
+  FROM emp e
+ WHERE e.COMM > 0
+;
+/*
+ 위의 실행 결과에서 comm 이 (null)인 사람들의 행은 
+ 처음부터 비교대상에 들지 않음에 주의 해야한다.
+ (null) 값은 비교연산자로 비교할 수 없는 값이다.
+*/
+
+--- 23) 영업사원(SALESMAN) 직무를 가진 사람들은 급여와 수당을 함께 받으므로
+--      영업사원의 실제 수령금을 계산해보자
+SELECT e.EMPNO
+     , e.ENAME
+     , e.JOB
+     , e.SAL + e.COMM "급여 + 수당"
+  FROM emp e
+;
+
+/*
+7369	SMITH	CLERK	
+7499	ALLEN	SALESMAN	1900
+7521	WARD	SALESMAN	1750
+7566	JONES	MANAGER	
+7654	MARTIN	SALESMAN	2650
+7698	BLAKE	MANAGER	
+7782	CLARK	MANAGER	
+7839	KING	PRESIDENT	
+7844	TURNER	SALESMAN	1500
+7900	JAMES	CLERK	
+7902	FORD	ANALYST	
+7934	MILLER	CLERK	
+
+==> 숫자값과 (null) 값의 산술 연산 결과는 결국 (null) 임을 주의하자
+*/
+
+-- (6) 연산자 : 3. 논리연산자
+--- NOT 연산자
+
+--- 24) 급여가 2000 보다 적지 않은 직원의 사번, 이름, 급여를 조회
+SELECT e.EMPNO
+     , e.ENAME
+     , e.SAL
+  FROM emp e
+ WHERE NOT e.SAL < 2000
+;
+
+-- 동일 결과를 내는 다른 쿼리 NOT 사용하지 않음
+SELECT e.EMPNO
+     , e.ENAME
+     , e.SAL
+  FROM emp e
+ WHERE e.SAL >= 2000
+;
+
+-- (6) 연산자 : 4. SQL 연산자
+--- IN 연산자 : 비교하고자 하는 기준 값이 제시된 항목 목록에 존재하면 참으로 판단
+
+--- 25) 급여가 800, 3000, 5000 중에 하나인 직원의 사번, 이름, 급여를 조회
+SELECT e.EMPNO
+     , e.ENAME
+     , e.SAL
+  FROM emp e
+ WHERE e.SAL = 800
+    OR e.SAL = 3000
+    OR e.SAL = 5000
+;
+-- IN 연산자를 사용하여 해결
+SELECT e.EMPNO
+     , e.ENAME
+     , e.SAL
+  FROM emp e
+ WHERE e.SAL IN (800, 3000, 5000)
+;
+
+--- LIKE 연산자 : 유사 값을 검색하는 데 사용
+/* LIKE 연산자는 유사값 검색을 위한 함께 사용하는 패턴 인식 문자가 있다.
+   % : 0자릿수 이상의 모든 문자 패턴이 올 수 있음
+   _ : 1자리의 모든 문자 패턴이 올 수 있음
+*/
+
+--- 26) 이름이 J 로 시작하는 직원의 사번, 이름 조회
+SELECT e.EMPNO
+     , e.ENAME
+  FROM emp e
+ WHERE e.ENAME LIKE 'J%'
+;
+-- 이름이 M 으로 시작하는 직원의 사번, 이름 조회
+SELECT e.EMPNO
+     , e.ENAME
+  FROM emp e
+ WHERE e.ENAME LIKE 'M%'
+;
+-- 이름에 M 이 들어가는 직원의 사번, 이름 조회
+SELECT e.EMPNO
+     , e.ENAME
+  FROM emp e
+ WHERE e.ENAME LIKE '%M%'
+;
+-- 이름의 두번째 자리에 M 이 들어가는 직원의 사번, 이름 조회
+SELECT e.EMPNO
+     , e.ENAME
+  FROM emp e
+ WHERE e.ENAME LIKE '_M%'
+;
+-- 이름의 세번째 자리에 M 이 들어가는 직원의 사번, 이름 조회
+SELECT e.EMPNO
+     , e.ENAME
+  FROM emp e
+ WHERE e.ENAME LIKE '__M%'
+;
+-- 이름의 둘째 자리부터 LA 가 들어가는 직원의 사번, 이름 조회
+SELECT e.EMPNO
+     , e.ENAME
+  FROM emp e
+ WHERE e.ENAME LIKE '_LA%'
+;
+
+-- 이름이 J_로 시작하는 직원의 사번, 이름 조회
+-- : 조회 값에 패턴인식 문자가 들어있는 데이터의 경우 어떻게 조회할 것인가?
+SELECT e.EMPNO
+     , e.ENAME
+  FROM emp e
+ WHERE e.ENAME LIKE 'J\%%' ESCAPE '\'
+;
+-- 조회하려는 값에 들어있는 패턴인식 문자를 무효화 하려면 ESCAPE 절과 조합한다.
