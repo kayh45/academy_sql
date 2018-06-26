@@ -295,3 +295,89 @@ SELECT e.EMPNO    AS 사번
    AND e.DEPTNO = 20
 ;
 -- 인출된 모든 행 : 0
+
+--  19) job이 'CLERK' 이면서 deptno가 10인 직원의
+--      사번, 이름, 직무, 부서번호를 조회
+SELECT e.EMPNO
+     , e.ENAME
+     , e.JOB
+     , e.DEPTNO
+  FROM emp e
+ WHERE e.JOB = 'CLERK' -- 문자값 비교시 ''사용, 문자값은 대소문자 구분
+   AND e.DEPTNO = 10   -- 숫자값 비교시 따옴표 사용하지 않음
+;
+
+--  20) 19번에서 직무 비교 값을 소문자 clerk과 비교하여 결과를 확인
+SELECT e.EMPNO
+     , e.ENAME
+     , e.JOB
+     , e.DEPTNO
+  FROM emp e
+ WHERE e.JOB = 'clerk' -- 문자값 비교시 ''사용, 문자값은 대소문자 구분
+   AND e.DEPTNO = 10   -- 숫자값 비교시 따옴표 사용하지 않음
+;
+
+-- 소문자 clerk으로 저장된 직무는 존재하지 않으므로
+-- 인출된 모든 행 : 0 결과가 발생함
+
+-- (6) 연산자 1. 산술연산자
+--- 21) 사번, 이름, 급여를 조회하고, 급여의 3.3%에 해당하는 원청징수 세금을 계산하여 조회
+SELECT e.EMPNO 사번
+     , e.ENAME 이름
+     , e.SAL   급여
+     , e.SAL * 0.033 원천징수세금
+  FROM emp e
+;
+-- 실수령액에 해당하는 96.7%의 급여도 계산하여 조회
+SELECT e.EMPNO 사번
+     , e.ENAME 이름
+     , e.SAL   급여
+     , e.SAL * 0.033 원천징수세금
+     , e.SAL * 0.967 실수령액
+  FROM emp e
+;
+-- 동일결과를 내는 다른 계산1
+SELECT e.EMPNO 사번
+     , e.ENAME 이름
+     , e.SAL   급여
+     , e.SAL * 0.033 원천징수세금
+     , e.SAL - (e.SAL * 0.033) 실수령액
+  FROM emp e
+;
+-- 동일결과를 내는 다른 계산2
+SELECT e.EMPNO 사번
+     , e.ENAME 이름
+     , e.SAL   급여
+     , e.SAL * 0.033 원천징수세금
+     , e.SAL * (1 - 0.033) 실수령액
+  FROM emp e
+;
+
+-- (6) 연산자 2. 비교연산자
+--     비교연산자는 SELECT 절에 사용할 수 없음
+--     WHERE, HAVING 절에만 사용함
+
+--- 22) 급여가 2000이 넘는 직원의 사번, 이름, 급여를 조회
+SELECT e.EMPNO
+     , e.ENAME
+     , e.SAL
+  FROM emp e
+ WHERE e.SAL > 2000
+;
+
+--- 급여가 1000 이상인 직원의 사번, 이름, 급여를 조회
+SELECT e.EMPNO
+     , e.ENAME
+     , e.SAL
+  FROM emp e
+ WHERE e.SAL >= 1000
+;
+
+--- 급여가 1000 이상이며 2000 미만인 직원의 사번, 이름, 급여를 조회
+SELECT e.EMPNO
+     , e.ENAME
+     , e.SAL
+  FROM emp e
+ WHERE e.SAL >= 1000
+   AND e.SAL < 2000
+;

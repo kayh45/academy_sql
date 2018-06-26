@@ -265,6 +265,7 @@ SELECT e.EMPNO AS "사번"
 ;
 /*
 사번     이름     직책    급여+커미션
+------------------------------------
 7654	MARTIN	SALESMAN	2650
 7698	BLAKE	MANAGER	
 */
