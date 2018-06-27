@@ -1,13 +1,13 @@
---ฝวฝภ 1)
-SELECT e.EMPNO AS "ป็น๘"
-     , e.ENAME AS "ภฬธง"
-     , e.JOB AS "พ๗นซ"
-     , e.SAL AS "ฑÞฟฉ"
+--์ค์ต 1)
+SELECT e.EMPNO AS "์ฌ๋ฒ"
+     , e.ENAME AS "์ด๋ฆ"
+     , e.JOB AS "์—…๋ฌด"
+     , e.SAL AS "๊ธ์—ฌ"
   FROM emp e
  ORDER BY e.SAL DESC
 ;
 /* 
-ป็น๘    ภฬธง      พ๗นซ      ฑÞฟฉ
+์ฌ๋ฒ    ์ด๋ฆ      ์—…๋ฌด      ๊ธ์—ฌ
 --------------------------------
 7839	KING	PRESIDENT	5000
 7902	FORD	ANALYST	    3000
@@ -24,15 +24,15 @@ SELECT e.EMPNO AS "ป็น๘"
 */
 
 
--- ฝวฝภ2)
-SELECT e.EMPNO AS "ป็น๘"
-     , e.ENAME AS "ภฬธง"
-     , e.HIREDATE AS "ภิป็ภฯ"
+-- ์ค์ต2)
+SELECT e.EMPNO AS "์ฌ๋ฒ"
+     , e.ENAME AS "์ด๋ฆ"
+     , e.HIREDATE AS "์…์ฌ์ผ"
   FROM emp e
  ORDER BY e.HIREDATE
 ;
 /*
-ป็น๘    ภฬธง     ภิป็ภฯ
+์ฌ๋ฒ    ์ด๋ฆ     ์…์ฌ์ผ
 ------------------------
 7369	SMITH	80/12/17
 7499	ALLEN	81/02/20
@@ -49,15 +49,15 @@ SELECT e.EMPNO AS "ป็น๘"
 */
 
 
--- ฝวฝภ 3)
-SELECT e.EMPNO AS "ป็น๘"
-     , e.ENAME AS "ภฬธง"
-     , e.COMM AS "ผ๖ด็"
+-- ์ค์ต 3)
+SELECT e.EMPNO AS "์ฌ๋ฒ"
+     , e.ENAME AS "์ด๋ฆ"
+     , e.COMM AS "์๋น"
   FROM emp e
  ORDER BY e.COMM
 ;
 /*
-ป็น๘     ภฬธง   ผ๖ด็
+์ฌ๋ฒ     ์ด๋ฆ   ์๋น
 --------------------
 7844	TURNER	0
 7499	ALLEN	300
@@ -74,15 +74,15 @@ SELECT e.EMPNO AS "ป็น๘"
 */
 
 
--- ฝวฝภ 4)
-SELECT e.EMPNO AS "ป็น๘"
-     , e.ENAME AS "ภฬธง"
-     , e.COMM AS "ผ๖ด็"
+-- ์ค์ต 4)
+SELECT e.EMPNO AS "์ฌ๋ฒ"
+     , e.ENAME AS "์ด๋ฆ"
+     , e.COMM AS "์๋น"
   FROM emp e
  ORDER BY e.COMM DESC
 ;
 /*
-ป็น๘     ภฬธง    ผ๖ด็
+์ฌ๋ฒ     ์ด๋ฆ    ์๋น
 ----------------------
 7369	SMITH	
 7698	BLAKE	
@@ -99,15 +99,15 @@ SELECT e.EMPNO AS "ป็น๘"
 */
 
 
---ฝวฝภ 5)
-SELECT e.EMPNO AS "ป็น๘"
-     , e.ENAME AS "ภฬธง"
-     , e.SAL AS "ฑÞฟฉ"
-     , e.HIREDATE AS "ภิป็ภฯ"
+--์ค์ต 5)
+SELECT e.EMPNO AS "์ฌ๋ฒ"
+     , e.ENAME AS "์ด๋ฆ"
+     , e.SAL AS "๊ธ์—ฌ"
+     , e.HIREDATE AS "์…์ฌ์ผ"
   FROM emp e
 ;
 /*
-ป็น๘     ภฬธง   ฑÞฟฉ      ภิป็ภฯ
+์ฌ๋ฒ     ์ด๋ฆ   ๊ธ์—ฌ      ์…์ฌ์ผ
 -------------------------------
 7369	SMITH	800 	80/12/17
 7499	ALLEN	1600	81/02/20
@@ -123,7 +123,7 @@ SELECT e.EMPNO AS "ป็น๘"
 7934	MILLER	1300	82/01/23
 */
 
--- ฝวฝภ 6) 
+-- ์ค์ต 6) 
 SELECT *
   FROM emp e
 ;
@@ -145,7 +145,7 @@ EMPNO   ENAME    JOB        MGR     HIREDATE    SAL    COMM   DEPTNO
 */
 
 
---ฝวฝภ 7)
+--์ค์ต 7)
 SELECT * 
   FROM emp e
  WHERE e.ENAME = 'ALLEN'
@@ -157,46 +157,46 @@ EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
 */
 
 
---ฝวฝภ 8)
-SELECT e.EMPNO AS "ป็น๘"
-     , e.ENAME AS "ภฬธง"
-     , e.DEPTNO AS "บฮผญน๘ศฃ"
+--์ค์ต 8)
+SELECT e.EMPNO AS "์ฌ๋ฒ"
+     , e.ENAME AS "์ด๋ฆ"
+     , e.DEPTNO AS "๋ถ€์๋ฒํธ"
   FROM emp e
  WHERE e.DEPTNO = 20
 ;
 /*
-ป็น๘    ภฬธง  บฮผญน๘ศฃ
+์ฌ๋ฒ    ์ด๋ฆ  ๋ถ€์๋ฒํธ
 ----------------------
 7369	SMITH	20
 7566	JONES	20
 7902	FORD	20
 */
 
--- ฝวฝภ 9)
-SELECT e.EMPNO  AS "ป็น๘"
-     , e.ENAME  AS "ภฬธง"
-     , e.SAL    AS "ฑÞฟฉ"
-     , e.DEPTNO AS "บฮผญน๘ศฃ"
+-- ์ค์ต 9)
+SELECT e.EMPNO  AS "์ฌ๋ฒ"
+     , e.ENAME  AS "์ด๋ฆ"
+     , e.SAL    AS "๊ธ์—ฌ"
+     , e.DEPTNO AS "๋ถ€์๋ฒํธ"
   FROM emp e
  WHERE e.DEPTNO = 20
    AND e.SAL < 3000
 ;
 /*
-ป็น๘     ภฬธง   ฑÞฟฉ  บฮผญน๘ศฃ
+์ฌ๋ฒ     ์ด๋ฆ   ๊ธ์—ฌ  ๋ถ€์๋ฒํธ
 -----------------------------
 7369	SMITH	800	    20
 7566	JONES	2975	20
 */
 
 
--- ฝวฝภ 10)
-SELECT e.EMPNO        AS "ป็น๘"
-     , e.ENAME        AS "ภฬธง"
-     , e.SAL + e.COMM AS "ฑÞฟฉ+ฤฟนฬผว"
+-- ์ค์ต 10)
+SELECT e.EMPNO        AS "์ฌ๋ฒ"
+     , e.ENAME        AS "์ด๋ฆ"
+     , e.SAL + e.COMM AS "๊ธ์—ฌ+์ปค๋ฏธ์…"
   FROM emp e
 ;
 /*
-ป็น๘     ภฬธง  ฑÞฟฉ+ฤฟนฬผว
+์ฌ๋ฒ     ์ด๋ฆ  ๊ธ์—ฌ+์ปค๋ฏธ์…
 -------------------------
 7369	SMITH	
 7499	ALLEN	1900
@@ -213,14 +213,14 @@ SELECT e.EMPNO        AS "ป็น๘"
 */
 
 
--- ฝวฝภ 11)
-SELECT e.EMPNO        AS "ป็น๘"
-     , e.ENAME        AS "ภฬธง"
-     , e.SAL * 12     AS "ณโฑÞฟฉ"
+-- ์ค์ต 11)
+SELECT e.EMPNO        AS "์ฌ๋ฒ"
+     , e.ENAME        AS "์ด๋ฆ"
+     , e.SAL * 12     AS "๋…๊ธ์—ฌ"
   FROM emp e
 ;
 /*
-ป็น๘    ภฬธง    ณโฑÞฟฉ
+์ฌ๋ฒ    ์ด๋ฆ    ๋…๊ธ์—ฌ
 ----------------------
 7369	SMITH	9600
 7499	ALLEN	19200
@@ -237,41 +237,41 @@ SELECT e.EMPNO        AS "ป็น๘"
 */
 
 
--- ฝวฝภ 12)
-SELECT e.EMPNO AS ป็น๘
-     , e.ENAME AS ภฬธง
-     , e.JOB   AS ม๗รฅ
-     , e.SAL   AS ฑÞฟฉ
-     , e.COMM  AS ฤฟนฬผว
+-- ์ค์ต 12)
+SELECT e.EMPNO AS ์ฌ๋ฒ
+     , e.ENAME AS ์ด๋ฆ
+     , e.JOB   AS ์ง์ฑ…
+     , e.SAL   AS ๊ธ์—ฌ
+     , e.COMM  AS ์ปค๋ฏธ์…
   FROM emp e
  WHERE e.ENAME = 'MARTIN'
     OR e.ENAME = 'BLAKE'
 ;
 /*
-ป็น๘     ภฬธง      ม๗รฅ      ฑÞฟฉ    ฤฟนฬผว
+์ฌ๋ฒ     ์ด๋ฆ      ์ง์ฑ…      ๊ธ์—ฌ    ์ปค๋ฏธ์…
 7654	MARTIN	SALESMAN	1250	1400
 7698	BLAKE	MANAGER	    2850	
 */
 
 
--- ฝวฝภ 13)
-SELECT e.EMPNO AS "ป็น๘"
-     , e.ENAME AS "ภฬธง"
-     , e.JOB   AS "ม๗รฅ"
-     , e.SAL + e.COMM   AS "ฑÞฟฉ+ฤฟนฬผว"
+-- ์ค์ต 13)
+SELECT e.EMPNO AS "์ฌ๋ฒ"
+     , e.ENAME AS "์ด๋ฆ"
+     , e.JOB   AS "์ง์ฑ…"
+     , e.SAL + e.COMM   AS "๊ธ์—ฌ+์ปค๋ฏธ์…"
   FROM emp e
  WHERE e.ENAME = 'MARTIN'
     OR e.ENAME = 'BLAKE'
 ;
 /*
-ป็น๘     ภฬธง     ม๗รฅ    ฑÞฟฉ+ฤฟนฬผว
+์ฌ๋ฒ     ์ด๋ฆ     ์ง์ฑ…    ๊ธ์—ฌ+์ปค๋ฏธ์…
 ------------------------------------
 7654	MARTIN	SALESMAN	2650
 7698	BLAKE	MANAGER	
 */
 
 
--- ฝวฝภ 14) 
+-- ์ค์ต 14) 
 SELECT *
   FROM emp e
  WHERE e.COMM != 0
@@ -296,7 +296,7 @@ EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
 */
 
 
--- ฝวฝภ 15)
+-- ์ค์ต 15)
 SELECT *
   FROM emp e
  WHERE e.COMM IS NOT NULL
@@ -312,7 +312,7 @@ EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
 */
 
 
--- ฝวฝภ 16)
+-- ์ค์ต 16)
 SELECT *
   FROM emp e
  WHERE e.DEPTNO = 20
@@ -326,7 +326,7 @@ EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
 */
 
 
--- ฝวฝภ 17)
+-- ์ค์ต 17)
 SELECT * 
   FROM emp e
  WHERE e.JOB = 'MANAGER'
@@ -343,7 +343,7 @@ EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
 */
 
 
--- ฝวฝภ 18)
+-- ์ค์ต 18)
 SELECT * 
   FROM emp e
  WHERE e.JOB IN ('MANAGER', 'CLERK', 'SALESMAN')
@@ -364,7 +364,7 @@ EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
 */
 
 
--- ฝวฝภ 19)
+-- ์ค์ต 19)
 SELECT *
   FROM emp e
  WHERE e.ENAME LIKE 'A%'
@@ -376,7 +376,7 @@ EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
 */
 
 
--- ฝวฝภ 20)
+-- ์ค์ต 20)
 SELECT *
   FROM emp e
  WHERE e.ENAME LIKE '%A%'
@@ -393,7 +393,7 @@ EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
 */
 
 
--- ฝวฝภ 21)
+-- ์ค์ต 21)
 SELECT *
   FROM emp e
  WHERE e.ENAME LIKE '%S'
@@ -406,7 +406,7 @@ EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
 */
 
 
--- ฝวฝภ 22)
+-- ์ค์ต 22)
 SELECT *
   FROM emp e
  WHERE e.ENAME LIKE '%E_'

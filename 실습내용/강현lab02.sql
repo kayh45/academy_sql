@@ -1,11 +1,4 @@
-/*
-
-18-06-27 10:20 lab 브런치 생성
-
-*/
-
-
--- �ǽ� 23)
+-- 실습 23)
 SELECT *
   FROM emp e
  WHERE e.SAL BETWEEN 2500 AND 3000
@@ -19,7 +12,7 @@ EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
 */
 
 
--- �ǽ� 24)
+-- 실습 24)
 SELECT *
   FROM emp e
  WHERE e.COMM IS NULL
@@ -38,7 +31,7 @@ EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
 */
 
 
--- �ǽ� 25)
+-- 실습 25)
 SELECT *
   FROM emp e
  WHERE e.COMM IS NOT NULL
@@ -53,24 +46,24 @@ EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
 */
 
 
--- �ǽ� 26)
-SELECT e.EMPNO AS ���
-     , e.ENAME || '�� ������ ' || e.SAL || '�Դϴ�.' AS ���޿�
+-- 실습 26)
+SELECT e.EMPNO AS 사번
+     , e.ENAME || '의 월급은 ' || e.SAL || '입니다.' AS 월급여
   FROM emp e
 ;
 /*
-���            ���޿�
+사번            월급여
 --------------------------------
-7369	SMITH�� ������ 800�Դϴ�.
-7499	ALLEN�� ������ 1600�Դϴ�.
-7521	WARD�� ������ 1250�Դϴ�.
-7566	JONES�� ������ 2975�Դϴ�.
-7654	MARTIN�� ������ 1250�Դϴ�.
-7698	BLAKE�� ������ 2850�Դϴ�.
-7782	CLARK�� ������ 2450�Դϴ�.
-7839	KING�� ������ 5000�Դϴ�.
-7844	TURNER�� ������ 1500�Դϴ�.
-7900	JAMES�� ������ 950�Դϴ�.
-7902	FORD�� ������ 3000�Դϴ�.
-7934	MILLER�� ������ 1300�Դϴ�.
+7369	SMITH의 월급은 800입니다.
+7499	ALLEN의 월급은 1600입니다.
+7521	WARD의 월급은 1250입니다.
+7566	JONES의 월급은 2975입니다.
+7654	MARTIN의 월급은 1250입니다.
+7698	BLAKE의 월급은 2850입니다.
+7782	CLARK의 월급은 2450입니다.
+7839	KING의 월급은 5000입니다.
+7844	TURNER의 월급은 1500입니다.
+7900	JAMES의 월급은 950입니다.
+7902	FORD의 월급은 3000입니다.
+7934	MILLER의 월급은 1300입니다.
 */
