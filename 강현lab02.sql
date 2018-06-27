@@ -67,3 +67,108 @@ SELECT e.EMPNO AS 사번
 7902	FORD의 월급은 3000입니다.
 7934	MILLER의 월급은 1300입니다.
 */
+
+
+
+/*===============================
+            함수
+================================*/
+
+
+-- 실습 1)
+SELECT INITCAP(e.ENAME) as "이름"
+  FROM emp e
+;
+/*
+이름
+-----
+Smith
+Allen
+Ward
+Jones
+Martin
+Blake
+Clark
+King
+Turner
+James
+Ford
+Miller
+J_June
+J
+J%Jones
+*/
+
+
+-- 실습 2)
+SELECT LOWER(e.ENAME) as "이름"
+  FROM emp e
+;
+/*
+이름
+-----
+smith
+allen
+ward
+jones
+martin
+blake
+clark
+king
+turner
+james
+ford
+miller
+j_june
+j
+j%jones
+*/
+
+
+-- 실습 3)
+SELECT UPPER(e.ENAME) as "이름"
+  FROM emp e
+;
+/*
+이름
+-----
+SMITH
+ALLEN
+WARD
+JONES
+MARTIN
+BLAKE
+CLARK
+KING
+TURNER
+JAMES
+FORD
+MILLER
+J_JUNE
+J
+J%JONES
+*/
+
+
+-- 실습 5)
+SELECT LENGTH('korea') AS "LENGTH"
+     , LENGTHB('korea') AS "LENGTHB"
+  FROM dual
+;
+/*
+LENGTH  LENGTHB
+----------------
+5	    5
+*/
+
+
+-- 실습 6)
+SELECT LENGTH('강현') AS "LENGTH"
+     , LENGTHB('강현') AS "LENGTHB"
+  FROM dual
+;
+/*
+LENGTH  LENGTHB
+----------------
+2	    6
+*/
