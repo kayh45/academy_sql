@@ -134,3 +134,258 @@ SELECT '오늘의 날짜는 ' || sysdate || '입니다.' as "오늘의 날짜"
 SELECT '안녕하세요. ' || e.ENAME || '씨, 당신의 사번은 ' || e.EMPNO || '입니다.' as "사번 알리미"
   FROM emp e
 ;
+
+-- (6) 연산자 : 6. 집합연산자
+-- 첫번째 쿼리
+SELECT *
+  FROM dept d
+;
+
+-- 두번째 쿼리 : 부서번호가 10번인 부서정보만 조회
+SELECT *
+  FROM dept d
+ WHERE d.DEPTNO = 10
+;
+
+-- 1) UNION ALL : 두 집합의 중복 데이터 허용하여 합집합
+SELECT *
+  FROM dept d
+ UNION ALL
+SELECT *
+  FROM dept d
+ WHERE d.DEPTNO = 10
+;
+
+-- 2) UNION : 중복을 제거한 합집합
+SELECT *
+  FROM dept d
+ UNION
+SELECT *
+  FROM dept d
+ WHERE d.DEPTNO = 10
+;
+
+-- 3) INTERSECT : 종복된 데이터만 남김 (교집합)
+SELECT *
+  FROM dept d  
+INTERSECT
+SELECT *
+  FROM dept d
+ WHERE d.DEPTNO = 10
+;
+
+-- 4) MINUS : 첫번째 쿼리 실행 결과에서 두번째 쿼리 실행결과를 뺀 차집합
+SELECT *
+  FROM dept d  
+ MINUS
+SELECT *
+  FROM dept d
+ WHERE d.DEPTNO = 10
+;
+
+-- 주의 ! : 각 쿼리 조회 결과의 컬럼 개수, 데이터 타입이 서로 일치해야함
+SELECT *           -- 첫번째 쿼리 조회 컬럼 개수는 3 
+  FROM dept d  
+ UNION ALL
+SELECT d.DEPTNO    -- 두번째 쿼리 조회 컬럼 개수는 2 
+     , d.DNAME
+  FROM dept d
+ WHERE d.DEPTNO = 10
+;
+-- > ORA-01789: query block has incorrect number of result columns
+
+SELECT d.DNAME     -- 문자형 데이터
+     , d.DEPTNO    -- 숫자형 데이터
+  FROM dept d  
+ UNION ALL
+SELECT d.DEPTNO    -- 숫자형 데이터  
+     , d.DNAME     -- 문자형 데이터
+  FROM dept d
+ WHERE d.DEPTNO = 10
+;
+-- > ORA-01790: expression must have same datatype as corresponding expression
+
+-- 서로 다른 테이블에서 조회한 결과를 집합연산 가능
+-- 첫번째 쿼리 : emp 테이블에서 조회
+SELECT e.EMPNO  -- 숫자
+     , e.ENAME  -- 문자
+     , e.JOB    -- 문자
+  FROM emp e
+;
+-- 두번째 쿼리 : dept 테이블에서 조회
+SELECT d.DEPTNO  -- 숫자
+     , d.DNAME   -- 문자
+     , d.LOC     -- 문자
+  FROM dept d
+;  
+
+-- 서로 다른 테이블의 조회 내용을 UNION
+SELECT e.EMPNO  -- 숫자
+     , e.ENAME  -- 문자
+     , e.JOB    -- 문자
+  FROM emp e
+ UNION
+SELECT d.DEPTNO  -- 숫자
+     , d.DNAME   -- 문자
+     , d.LOC     -- 문자
+  FROM dept d
+;
+/*
+EMPNO     ENAME       JOB
+-----------------------------
+10	    ACCOUNTING	NEW YORK
+20	    RESEARCH	DALLAS
+30	    SALES	    CHICAGO
+40	    OPERATIONS	BOSTON
+7369	SMITH	    CLERK
+7499	ALLEN	    SALESMAN
+7521	WARD	    SALESMAN
+7566	JONES	    MANAGER
+7654	MARTIN	    SALESMAN
+7698	BLAKE	    MANAGER
+7777	J%JONES	    CLERK
+7782	CLARK	    MANAGER
+7839	KING	    PRESIDENT
+7844	TURNER	    SALESMAN
+7900	JAMES	    CLERK
+7902	FORD	    ANALYST
+7934	MILLER	    CLERK
+8888	J	        CLERK
+9999	J_JUNE	    CLERK
+*/
+
+
+-- 서로 다른 테이블의 조회 내용을 MINUS
+SELECT e.EMPNO  -- 숫자
+     , e.ENAME  -- 문자
+     , e.JOB    -- 문자
+  FROM emp e
+ MINUS
+SELECT d.DEPTNO  -- 숫자
+     , d.DNAME   -- 문자
+     , d.LOC     -- 문자
+  FROM dept d
+;
+/*
+EMPNO     ENAME       JOB
+-----------------------------
+7369	SMITH	CLERK
+7499	ALLEN	SALESMAN
+7521	WARD	SALESMAN
+7566	JONES	MANAGER
+7654	MARTIN	SALESMAN
+7698	BLAKE	MANAGER
+7777	J%JONES	CLERK
+7782	CLARK	MANAGER
+7839	KING	PRESIDENT
+7844	TURNER	SALESMAN
+7900	JAMES	CLERK
+7902	FORD	ANALYST
+7934	MILLER	CLERK
+*/
+
+-- 서로 다른 테이블의 조회 내용을 INTERSECT
+SELECT e.EMPNO  -- 숫자
+     , e.ENAME  -- 문자
+     , e.JOB    -- 문자
+  FROM emp e
+ INTERSECT
+SELECT d.DEPTNO  -- 숫자
+     , d.DNAME   -- 문자
+     , d.LOC     -- 문자
+  FROM dept d
+;
+-- 조회 결과 없음
+-- 인출된 모든 행 : 0
+-- no rows selected
+
+
+-- (6) 연산자 : 7. 연산자 우선순위
+
+/*
+    주어진 조건 3가지
+    1. mgr = 7698
+    2. job = 'CLERK'
+    3. sal > 1300
+*/
+
+--- 1) 매니저가 7698 번이며, 직무는 CLERK 이거나
+--     급여는 1300이 넘는 조건을 만족하는 직원의 정보를 조회
+SELECT e.EMPNO
+     , e.ENAME
+     , e.JOB
+     , e.SAL
+     , e.MGR
+  FROM emp e
+ WHERE e.MGR = 7698 
+   AND e.JOB = 'CLERK'
+    OR e.SAL > 1300
+;
+/*
+EMPNO   ENAME     JOB       SAL      MGR
+------------------------------------------
+7499	ALLEN	SALESMAN	1600	7698
+7566	JONES	MANAGER	    2975	7839
+7698	BLAKE	MANAGER 	2850	7839
+7782	CLARK	MANAGER	    2450	7839
+7839	KING	PRESIDENT	5000	
+7844	TURNER	SALESMAN	1500	7698
+7900	JAMES	CLERK	    950 	7698
+7902	FORD	ANALYST	    3000	7566
+*/
+
+
+--- 2) 매니저가  7698 번인 직원중에서
+--     직무가 CLERK 이거나 급여가 1300이 넘는 조건을 만족하는 직원 정보
+SELECT e.EMPNO
+     , e.ENAME
+     , e.JOB
+     , e.SAL
+     , e.MGR
+  FROM emp e
+ WHERE e.MGR = 7698 
+   AND (e.JOB = 'CLERK' OR e.SAL > 1300)
+;
+/*
+EMPNO   ENAME     JOB       SAL      MGR
+------------------------------------------
+7499	ALLEN	SALESMAN	1600	7698
+7844	TURNER	SALESMAN	1500	7698
+7900	JAMES	CLERK	    950	    7698
+*/
+
+--- 3) 직무가 CLERK 이거나 
+--     급여가 1300이 넘으면서 매니저가 7698인 직원의 정보 조회
+
+SELECT e.EMPNO
+     , e.ENAME
+     , e.JOB
+     , e.SAL
+     , e.MGR
+  FROM emp e
+ WHERE e.JOB = 'CLERK'
+    OR (e.SAL > 1300 AND e.MGR = 7698)
+;
+SELECT e.EMPNO
+     , e.ENAME
+     , e.JOB
+     , e.SAL
+     , e.MGR
+  FROM emp e
+ WHERE e.JOB = 'CLERK'
+    OR e.SAL > 1300 
+    AND e.MGR = 7698
+; -- > 괄호를 안써줘도 우선순위에 따라서 똑같이 실행된다.
+
+/*
+EMPNO   ENAME     JOB       SAL      MGR
+------------------------------------------
+7369	SMITH	CLERK	    800	    7902
+7499	ALLEN	SALESMAN	1600	7698
+7844	TURNER	SALESMAN	1500	7698
+7900	JAMES	CLERK	    950	    7698
+7934	MILLER	CLERK	    1300	7782
+9999	J_JUNE	CLERK	    500	
+8888	J	    CLERK	    400	
+7777	J%JONES	CLERK	    300	
+*/
