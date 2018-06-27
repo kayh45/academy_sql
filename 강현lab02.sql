@@ -252,50 +252,86 @@ SQL 배우기
 
 
 -- 실습 13)
-SELECT NVL(e.COMM, 0) as "커미션"
+SELECT e.EMPNO        as "사원번호"
+     , e.ENAME        as "이름"
+     , NVL(e.COMM, 0) as "커미션"
   FROM emp e
 ;
 /*
-커미션
-----------
-0
-300
-500
-0
-1400
-0
-0
-0
-0
-0
-0
-0
-0
-0
-0 
+사원번호  이름  커미션
+------------------------
+7369	SMITH	0
+7499	ALLEN	300
+7521	WARD	500
+7566	JONES	0
+7654	MARTIN	1400
+7698	BLAKE	0
+7782	CLARK	0
+7839	KING	0
+7844	TURNER	0
+7900	JAMES	0
+7902	FORD	0
+7934	MILLER	0
+9999	J_JUNE	0
+8888	J	    0
+7777	J%JONES	0
 */
 
 
 -- 실습 14)
-SELECT NVL2(e.COMM, e.SAL + e.COMM, 0) as "급여 + 커미션"
+SELECT e.EMPNO        as "사원번호"
+     , e.ENAME        as "이름"
+     , NVL2(e.COMM, e.SAL + e.COMM, 0) as "급여 + 커미션"
   FROM emp e
 ;
 /*
-급여 + 커미션
-----------
-0
-1900
-1750
-0
-2650
-0
-0
-0
-1500
-0
-0
-0
-0
-0
-0
+사원번호 이름  급여 + 커미션
+---------------------------
+7369	SMITH	0
+7499	ALLEN	1900
+7521	WARD	1750
+7566	JONES	0
+7654	MARTIN	2650
+7698	BLAKE	0
+7782	CLARK	0
+7839	KING	0
+7844	TURNER	1500
+7900	JAMES	0
+7902	FORD	0
+7934	MILLER	0
+9999	J_JUNE	0
+8888	J	    0
+7777	J%JONES	0
+*/
+
+-- 실습 15)
+SELECT e.EMPNO as "사원번호"
+     , e.ENAME as "이름"
+     , e.SAL   as "급여"
+     , TO_CHAR(DECODE(e.JOB
+                    , 'CLERK'    , 300
+                    , 'SALESMAN' , 450
+                    , 'MANAGER'  , 600
+                    , 'ANALYST'  , 800
+                    , 'PRESIDENT', 1000), '$9999') as "자기 계발비"
+  FROM emp e
+;
+/*
+사원번호 이름   급여    자기 계발비
+----------------------------------
+7369	SMITH	800	      $300
+7499	ALLEN	1600	  $450
+7521	WARD	1250	  $450
+7566	JONES	2975	  $600
+7654	MARTIN	1250	  $450
+7698	BLAKE	2850	  $600
+7782	CLARK	2450	  $600
+7839	KING	5000	 $1000
+7844	TURNER	1500	  $450
+7900	JAMES	950	      $300
+7902	FORD	3000	  $800
+7934	MILLER	1300	  $300
+9999	J_JUNE	500	      $300
+8888	J	    400	      $300
+7777	J%JONES	300	      $300
 */
