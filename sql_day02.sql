@@ -571,4 +571,94 @@ SELECT NULLIF('AAA', 'AAA')
 ;  
 -- 조회된 결과 1행이 NULL인 결과를 얻게 됨
 -- 1행이라도 NULL이 조회된 결과는 인출된 모든 행 :0 과는 상태가 다름!
-  
+
+--- 3) 날짜함수 : 날짜 출력 패턴 조합으로 다양하게 출력 가능
+
+-- TO_CAHR() : 숫자나 날짜를 문자형으로 변환
+SELECT sysdate FROM dual;
+SELECT TO_CHAR(sysdate, 'YYYY') FROM dual;
+SELECT TO_CHAR(sysdate, 'YY') FROM dual;
+SELECT TO_CHAR(sysdate, 'MM') FROM dual;
+SELECT TO_CHAR(sysdate, 'MONTH') FROM dual;
+SELECT TO_CHAR(sysdate, 'MON') FROM dual;
+SELECT TO_CHAR(sysdate, 'DD') FROM dual;
+SELECT TO_CHAR(sysdate, 'D') FROM dual;
+SELECT TO_CHAR(sysdate, 'DAY') FROM dual;
+SELECT TO_CHAR(sysdate, 'DY') FROM dual;
+
+-- 패턴을 조합
+SELECT TO_CHAR(sysdate, 'YYYY-MM-DD') FROM dual;
+SELECT TO_CHAR(sysdate, 'FMYYYY-MM-DD') FROM dual;
+SELECT TO_CHAR(sysdate, 'YY-MONTH-DD') FROM dual;
+SELECT TO_CHAR(sysdate, 'YY-MONTH-DD DAY') FROM dual;
+SELECT TO_CHAR(sysdate, 'YY-MONTH-DD DY') FROM dual;
+
+/* 시간 패턴 :  
+    HH : 시간을 두 자리로 표기
+    MI : 분을 두 자리로 표기
+    SS : 초를 두 자리로 표기
+    HH24 : 시간을 24시간 체계로 표기
+    AM : 오전인지 오후인지 표기
+*/
+
+SELECT TO_CHAR(sysdate, 'YYYY-MM-DD HH24:MI:SS') FROM dual;
+SELECT TO_CHAR(sysdate, 'YYYY-MM-DD AM HH:MI:SS') FROM dual;
+
+-- 날짜 값과 숫자의 연산 : + - 연산 가능
+-- 10일 후
+SELECT sysdate + 10 FROM dual;
+-- 10일 전
+SELECT sysdate - 10 FROM dual;
+-- 10시간 후
+SELECT TO_CHAR(sysdate + (10/24), 'YYYY-MM-DD AM HH:MI:SS') FROM dual;
+
+---- 1. MONTHS_BETWEEN(날짜1, 날짜2) : 두 날짜 사이의 달의 차이
+SELECT MONTHS_BETWEEN(sysdate, e.HIREDATE)
+  FROM emp e;
+
+---- 2. ADD_MONTHS(날짜1, 숫자) : 날짜 1에 숫자만큼 더한 후의 날짜를 구함
+SELECT ADD_MONTHS(sysdate, 3) FROM dual;
+
+---- 3. NEXT_DAY, LAST_DAY : 다음 요일에 해당하는 날짜를 구함, 이 달의 마지막 날짜
+SELECT NEXT_DAY(sysdate, '일요일') FROM dual;
+SELECT NEXT_DAY(sysdate, 1) FROM dual;
+SELECT LAST_DAY(sysdate) FROM dual;
+
+---- 4. ROUND, TRUNC : 날짜 관련 반올림 , 버림
+SELECT ROUND(sysdate) FROM dual;
+SELECT TO_CHAR(ROUND(sysdate), 'YYYY-MM-DD HH24:MI:SS') FROM dual;
+SELECT TRUNC(sysdate) FROM duaL;
+SELECT TO_CHAR(TRUNC(sysdate), 'YYYY-MM-DD HH24:MI:SS') FROM duaL;
+
+
+--- 4) 데이터 타입 변환 함수
+/*
+    TO_CHAR()   : 숫자, 날짜                ===> 문자
+    TO_DATE()   : 날짜 형식의 문자           ===> 날짜
+    TO_NUMBER() : 숫자로만 구성된 문자 데이터 ===> 숫자
+*/
+
+---- 1. TO_CHAR() : 숫자패턴 적용
+--      숫자 패턴 : 9 ==> 한 자리 숫자
+SELECT TO_CHAR(12345, '9999') FROM dual;
+SELECT TO_CHAR(12345, '99999') FROM dual;
+
+SELECT TO_CHAR(12345, '9999999') data
+  FROM dual
+;
+-- 앞에 빈칸을 0으로 채우기
+SELECT TO_CHAR(12345, '0999999') data
+  FROM dual
+;
+-- 소수점 이하 표현
+SELECT TO_CHAR(12345, '999999.99') data
+  FROM dual
+;
+-- 숫자 패턴에서 3자리씩 끊어 읽기 + 소수점 이하 표현
+SELECT TO_CHAR(12345, '9,999,999,999') data
+  FROM dual
+;
+
+---- 2. TO_DATE() : 날자 패턴에 맞는 문자 값을 날짜 데이터로 변경
+SELECT TO_DATE('2018-06-27', 'YYYY-MM-DD') AS TODAY FROM dual;
+
