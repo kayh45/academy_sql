@@ -485,3 +485,90 @@ SELECT e.EMPNO
 
 
 --- 2) 문자 함수
+---- 1. INITCAP(str) : str의 첫 글자를 대문자화 (영문인 경우)
+SELECT INITCAP('the soap') FROM dual; -- The Soap
+
+---- 2. LOWER(str) : str을 소문자화 (영문인 경우)
+SELECT LOWER('MR. SCOTT MCMILLAN') "소문자로 변경" FROM dual;
+---- 3. UPPER(str) : str을 대문자화 (영문인 경우)
+SELECT UPPER('lee') "성을 대문자로 변경" FROM dual;
+SELECT UPPER('sql is cooooooooooooooooool~!!') "씐나!" FROM dual;
+---- 4. LENGTH(str), LENGTHB(str) : str의 글자길이를 계산
+SELECT LENGTH('hello, sql') as "글자 길이" FROM dual;
+SELECT 'hello, sql의 글자 길이는 ' || LENGTH('hello, sql') || '입니다.' as "글자 길이" FROM dual;
+
+-- oracle에서 한글은 3byte으로 계산
+SELECT LENGTHB('hello, sql') as "글자 byte" FROM dual;
+SELECT LENGTHB('오라클') as "글자 byte" FROM dual;
+
+---- 5. CONCAT(str1, str2) : str1, str2 문자열을 접합, || 연산자와 동일
+SELECT CONCAT('안녕하세요, ', 'SQL') FROM dual;
+SELECT '안녕하세요, ' || 'SQL' FROM dual;
+
+---- 6. SUBSTR(str, i, n) : str에서 i번째 위치에서 n개의 글자를 추출
+--      SQL에서 문자열 인덱스를 나타내는 i는 1부터 시작에 주의함!!!!!!!!!
+SELECT SUBSTR('sql is cooooooooooooooooool~!!', 3, 4) FROM dual;
+--     SUBSTR(str, i) : i 번째 위치에서 문자열 끝까지 추출
+SELECT SUBSTR('sql is cooooooooooooooooool~!!', 3) FROM dual;
+
+
+---- 7. INSTR(str1, str2) : 2번째 문자열이 1번째 문자열 어디에 위치하는가 등장하는 위치를 계산
+SELECT INSTR('sql is cooooooooooooooooool~!!', 'is') FROM dual;
+SELECT INSTR('sql is cooooooooooooooooool~!!', 'ia') FROM dual;
+-- 2번째 문장이 등장하지 않으면 0으로 계산
+
+---- 8. LPAD, RPAD(str, n, c)
+--      : 입력된 str에 대해서, 전체 글자의 자릿수를 n으로 잡고
+--        남는 공간에 왼쪽, 혹은 오른쪽으로 c의 문자를 채워넣는다.
+SELECT LPAD('sql is cooool', 20, '!') FROM dual;
+SELECT RPAD('sql is cooool', 25, '!') FROM dual;
+
+---- 9. LTRIM, RTRIM, TRIM : 입력된 문자열의 왼쪽, 오른쪽, 양쪽 공백 제거
+SELECT '>' || LTRIM('         sql is cool       ') || '<' FROM dual;
+SELECT '>' || RTRIM('         sql is cool       ') || '<' FROM dual;
+SELECT '>' || TRIM('         sql is cool       ') || '<' FROM dual;
+
+---- 10. NVL(expr1, expr2), NVL2(expr1, expr2, expr3), NULLIF(expr1, expr2)
+-- nvl(expr1, expr2) : 첫 번째 식의 값이 NULL이면 두 번째 식으로 대체하여 출력
+-- mgr가 배정안된 직원의 경우 '매니저 없음'으로 변경해서 출력
+SELECT e.EMPNO
+     , e.ENAME
+     , NVL(e.MGR, '매니저 없음')  -- mgr 숫자 데이터, 변경 출력이 문자, 타입 불일치로 실행이 안됨
+  FROM emp e
+;
+---------------
+SELECT e.EMPNO
+     , e.ENAME
+     , NVL(e.MGR, 0)  
+  FROM emp e
+;
+---------------
+SELECT e.EMPNO
+     , e.ENAME
+     , NVL(e.MGR || '', '매니저 없음') 
+     -- || 결합연산자로 '' 빈문자를 붙여서 형 변환 
+  FROM emp e
+;
+
+--nvl2(expr1, expr2, expr3) : 첫 번째 식의 값이 NOT NULL이면 두 번째 식의 값으로 대체하여 출력하고
+--                                             NULL이면 세 번째 식의 값으로 대체하여 출력
+
+SELECT e.EMPNO
+     , e.ENAME
+     , NVL2(e.MGR,'매니저 있음' , '매니저 없음') 
+  FROM emp e
+;
+
+--nullif(expr1, expr2) : 첫 번째 식, 두 번째 식의 값이 동일하면 NULL을 출력
+--                                          식이 다르면 첫 번째 식의 값을 출력
+
+SELECT NULLIF('AAA', 'bbb') 
+  FROM dual
+;  
+
+SELECT NULLIF('AAA', 'AAA') 
+  FROM dual
+;  
+-- 조회된 결과 1행이 NULL인 결과를 얻게 됨
+-- 1행이라도 NULL이 조회된 결과는 인출된 모든 행 :0 과는 상태가 다름!
+  
