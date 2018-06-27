@@ -150,7 +150,7 @@ J%JONES
 */
 
 
--- 실습 5)
+-- 실습 4)
 SELECT LENGTH('korea') AS "LENGTH"
      , LENGTHB('korea') AS "LENGTHB"
   FROM dual
@@ -162,7 +162,7 @@ LENGTH  LENGTHB
 */
 
 
--- 실습 6)
+-- 실습 5)
 SELECT LENGTH('강현') AS "LENGTH"
      , LENGTHB('강현') AS "LENGTHB"
   FROM dual
@@ -171,4 +171,131 @@ SELECT LENGTH('강현') AS "LENGTH"
 LENGTH  LENGTHB
 ----------------
 2	    6
+*/
+
+
+-- 실습 6)
+SELECT CONCAT('SQL', '배우기') as result
+  FROM dual
+;
+/*
+RESULT
+----------
+SQL 배우기
+*/
+
+
+-- 실습 7)
+SELECT SUBSTR('SQL 배우기', 5, 2) as result
+  FROM dual
+;
+/*
+RESULT
+----------
+배우
+*/
+
+
+-- 실습 8)
+SELECT LPAD('SQL', 7, '$') as result
+  FROM dual
+;
+/*
+RESULT
+----------
+$$$$SQL
+*/
+
+
+-- 실습 9)
+SELECT RPAD('SQL', 7, '$') as result
+  FROM dual
+;
+/*
+RESULT
+----------
+SQL$$$$
+*/
+
+
+-- 실습 10)
+SELECT LTRIM('     SQL 배우기   ') as result
+  FROM dual
+;
+/*
+RESULT
+----------
+SQL 배우기   
+*/
+
+
+-- 실습 11)
+SELECT RTRIM('     SQL 배우기   ') as result
+  FROM dual
+;
+/*
+RESULT
+----------
+     SQL 배우기   
+*/
+
+
+-- 실습 12)
+SELECT TRIM('     SQL 배우기   ') as result
+  FROM dual
+;
+/*
+RESULT
+----------
+SQL 배우기   
+*/
+
+
+-- 실습 13)
+SELECT NVL(e.COMM, 0) as "커미션"
+  FROM emp e
+;
+/*
+커미션
+----------
+0
+300
+500
+0
+1400
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0 
+*/
+
+
+-- 실습 14)
+SELECT NVL2(e.COMM, e.SAL + e.COMM, 0) as "급여 + 커미션"
+  FROM emp e
+;
+/*
+급여 + 커미션
+----------
+0
+1900
+1750
+0
+2650
+0
+0
+0
+1500
+0
+0
+0
+0
+0
+0
 */
