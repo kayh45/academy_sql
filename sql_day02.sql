@@ -662,3 +662,7 @@ SELECT TO_CHAR(12345, '9,999,999,999') data
 ---- 2. TO_DATE() : 날자 패턴에 맞는 문자 값을 날짜 데이터로 변경
 SELECT TO_DATE('2018-06-27', 'YYYY-MM-DD') AS TODAY FROM dual;
 
+
+---- 3. TO_NUMBER() : 오라클이 자동 형변환을 제공하므로 자주 사용은 안됨
+SELECT '1000' +10 result FROM dual;
+SELECT TO_NUMBER('1000') +10 result FROM dual;
