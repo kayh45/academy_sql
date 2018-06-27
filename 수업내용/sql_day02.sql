@@ -389,3 +389,99 @@ EMPNO   ENAME     JOB       SAL      MGR
 8888	J	    CLERK	    400	
 7777	J%JONES	CLERK	    300	
 */
+
+---------- 6. 함수
+-- (2) dual 테이블 : 1행 1열로 구성된 시스템 테이블
+DESC dual; --> 문자데이터 1칸으로 구성된 dummy 컬럼을 가진 테이블
+
+-- dummy 컬럼에 X값이 하나 들어있음을 확인할 수 있다.
+SELECT *
+  FROM dual
+;
+
+-- dual 테이블을 사용하여 날짜 조회
+SELECT sysdate
+  FROM dual
+;
+
+  
+-- (3) 단일행 함수
+--- 1) 숫자함수 : 
+---- 1. MOD(m,n) : m을 n으로 나눈 나머지 계산함수
+SELECT mod(10, 3) as result
+  FROM dual
+;
+SELECT mod(10, 3) as result
+  FROM emp
+;
+SELECT mod(10, 3) as result
+  FROM dept
+;
+
+-- 각 사원의 급여를 3으로 나눈 나머지를 조회
+SELECT e.EMPNO
+     , e.ENAME
+     , MOD(e.SAL, 3) as result
+  FROM emp e
+;
+/*
+EMPNO   ENAME  RESULT
+----------------------
+7369	SMITH	2
+7499	ALLEN	1
+7521	WARD	2
+7566	JONES	2
+7654	MARTIN	2
+7698	BLAKE	0
+7782	CLARK	2
+7839	KING	2
+7844	TURNER	0
+7900	JAMES	2
+7902	FORD	0
+7934	MILLER	1
+9999	J_JUNE	2
+8888	J	1
+7777	J%JONES	0
+*/
+
+---- 2. ROUND(m,n) : 실수 m을 소수점 n + 1 자리에서 반올림 한 결과를 계산
+SELECT ROUND(1234.56, 1) FROM dual; -- 1234.6
+SELECT ROUND(1234.56, 0) FROM dual; -- 1235
+SELECT ROUND(1234.46, 0) FROM dual; -- 1234
+--     ROUND(m) : n값을 생략하면 소수점 이하 첫째자리 반올림 바로 수행
+--                즉, n값을 0으로 수행함
+SELECT ROUND(1234.56) FROM dual; -- 1235
+SELECT ROUND(1234.46) FROM dual; -- 1234
+
+---- 3. TRUNC(m, n) : 실수 m을 n에서 지정한 자리 이하 소수점 버림
+SELECT TRUNC(1234.56, 1) FROM dual; -- 1234.5
+SELECT TRUNC(1234.56, 0) FROM dual; -- 1234
+SELECT TRUNC(1234.56) FROM dual; -- 1234
+
+---- 4. CEIL(n) : 입력된 실수 n에서 같거나 가장 큰 가까운 정수
+SELECT CEIL(1234.56) FROM dual; -- 1235
+SELECT CEIL(1234) FROM dual; -- 1234
+SELECT CEIL(1234.001) FROM dual; -- 1235
+
+---- 5. FLOOR(n) : 입력된 실수 n에서 같거나 가장 가까운 작은 정수
+SELECT FLOOR(1234.56) FROM dual; -- 1234
+SELECT FLOOR(1234) FROM dual;    -- 1234
+SELECT FLOOR(1235.56) FROM dual; -- 1235
+
+---- 6. WIDTH_BUCKET(expr, min , max, buckets)
+-- : min, max 값 사이를 buckets 개수만큼의 구간으로 나누고
+--   expr이 출력하는 값이 어느 구간인지 위치를 숫자로 찾아줌
+
+-- 급여 범위를 0 ~ 5000 으로 잡고, 5개의 구간으로 나누어서
+-- 각 직원의 급여가 어느 구간에 해당하는지 보고서를 출력해보자.
+
+SELECT e.EMPNO
+     , e.ENAME
+     , e.SAL
+     , WIDTH_BUCKET(e.SAL, 0, 5000, 5) as "급여 구간"
+  FROM emp e
+ ORDER BY "급여 구간" DESC
+;
+
+
+--- 2) 문자 함수
