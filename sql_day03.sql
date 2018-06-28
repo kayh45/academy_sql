@@ -413,7 +413,7 @@ HAVING e.DEPTNO IS NOT NULL
 ;
 -- 3. 직무별 급여 평균 구하고, 급여 평균 높은 순으로 정렬
 SELECT e.JOB      as "직무"
-     , AVG(e.SAL) as "급여 평균"
+     , TO_CHAR(AVG(e.SAL), '$9,999') as "급여 평균"
   FROM emp e
  GROUP BY e.JOB
 HAVING e.JOB IS NOT NULL
@@ -421,13 +421,13 @@ HAVING e.JOB IS NOT NULL
 ;
 -- 4. 직무별 급여 총합을 구하고, 총합 높은 순으로 정렬
 SELECT e.JOB      as "직무"
-     , SUM(e.SAL) as "급여 총합"
+     , TO_CHAR(SUM(e.SAL), '$9,999') as "급여 총합"
   FROM emp e
  GROUP BY e.JOB
 HAVING e.JOB IS NOT NULL
  ORDER BY "급여 총합" DESC 
 ;  
--- 5. 급여의 앞 단위가 1000이하, 1000, 2000, 3000, 5000 별로 인원수를 구하시오
+-- 5. 급여의 앞 단위가 1000미만, 1000, 2000, 3000, 5000 별로 인원수를 구하시오
 --    이때 급여 단위 오름차순으로 정렬
 SELECT TRUNC(e.SAL, -3)   as "급여 단위"
      , COUNT(*)           as "인원수"
@@ -435,12 +435,48 @@ SELECT TRUNC(e.SAL, -3)   as "급여 단위"
  GROUP BY TRUNC(e.SAL, -3)
  ORDER BY "급여 단위"
 ;
+------ 급여 단위가 1000미만인 경우 0으로 출력되는 것을 변경
+--     : 범위 연산이 필요해 보임 === > CASE 구문 선택
+SELECT CASE WHEN TRUNC(e.SAL, -3) < 1000 THEN '1000 미만'        
+            ELSE TRUNC(e.SAL, -3)||''
+        END as "급여 단위"
+     , COUNT(TRUNC(e.SAL, -3)) as "인원수"
+  FROM emp e
+ GROUP BY TRUNC(e.SAL, -3)
+ ORDER BY TRUNC(e.SAL, -3)
+;
+----- 다른 함수로 풀이
+-- a) sal 컬럼에 왼쪽으로 패딩을 붙여서 0을 채움
+SELECT e.EMPNO
+     , e.ENAME
+     , LPAD(e.SAL, 4, '0')
+  FROM emp e
+;
+-- b) 맨 앞의 글자를 잘라낸다.
+SELECT e.EMPNO
+     , e.ENAME
+     , SUBSTR(LPAD(e.SAL, 4, '0'), 1, 1)
+  FROM emp e
+;
+-- c) 1000단위로 처리 + COUNT + 그룹화
+SELECT SUBSTR(LPAD(e.SAL, 4, '0'), 1, 1) "급여 단위"
+     , COUNT(*) "인원(명)"
+  FROM emp e
+ GROUP BY SUBSTR(LPAD(e.SAL, 4, '0'), 1, 1)
+;
+-- d) 1000단위로 출력 형태 변경
+SELECT CASE WHEN SUBSTR(LPAD(e.SAL, 4, '0'), 1, 1) = 0 THEN '1000 미만'
+            ELSE TO_CHAR(SUBSTR(LPAD(e.SAL, 4, '0'), 1, 1)  * 1000)
+        END     "급여 단위"
+     , COUNT(*) "인원(명)"
+  FROM emp e
+ GROUP BY SUBSTR(LPAD(e.SAL, 4, '0'), 1, 1)
+;
 -- 6. 직무별 급여 합의 단위를 구하고, 급여 합의 단위가 큰 순으로 정렬
-SELECT e.JOB      as "직무"
+SELECT NVL(e.JOB, '미배정')        as "직무"
      , TRUNC(SUM(e.SAL), -3) as "급여 합의 단위"
   FROM emp e
  GROUP BY e.JOB
-HAVING e.JOB IS NOT NULL
  ORDER BY "급여 합의 단위" DESC
 ;
 -- 7. 직무별 급여 평균이 2000 이하인 경우를 구하고 평균이 높은 순으로 정렬
