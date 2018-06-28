@@ -391,6 +391,18 @@ HAVING "급여 평균" >= 2000
 ;
 -- 오류코드 : HAVING의 조건에 별칭을 사용하였기 때문
 
+--HAVING 절이 존재하는 경우 SELECT의 구문의 실행 순서 정리
+
+/*
+  1. FROM 절의 테이블 각 행을 대상으로
+  2. WHERE 절의 조건에 맞는 행만 선택하고
+  3. GROUP BY 절에 나온 컬럼, 식(함수 식 등)으로 그룹화를 진행
+  4. HAVING 절의 조건을 만족시키는 그룹행만 선택
+  5. 4까지 선택된 그룹 정보를 가진 행에 대해서
+     SELECT절에 명시된 컬럼, 식(함수 식 등)만 출력
+  6. ORDER BY가 있다면 정렬조건에 맞추어 최종 정렬하여 보여 준다.
+*/
+
 
 -----------------------------------------------------------------------------
 -- 수업중 실습
@@ -485,7 +497,7 @@ SELECT e.JOB      as "직무"
   FROM emp e
  GROUP BY e.JOB
 HAVING AVG(e.SAL) <= 2000
- ORDER BY "직무별 급여 평균"
+ ORDER BY "직무별 급여 평균" DESC
 ;
 -- 8. 년도별 입사 인원을 구하시오
 SELECT TO_CHAR(e.HIREDATE, 'YYYY')   as "입사 년도"
@@ -508,3 +520,174 @@ SELECT TO_CHAR(e.HIREDATE, 'YYYY')      as "입사 년도"
   FROM emp e
  GROUP BY TO_CHAR(e.HIREDATE, 'YYYY'), TO_CHAR(e.HIREDATE, 'MM')
  ORDER BY "입사 년도", "입사 월"
+;
+
+SELECT TO_CHAR(e.HIREDATE, 'YYYY')      as "입사 년도"
+     , NVL(SUM(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '01', 1)),0) as "1월"
+     , NVL(SUM(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '02', 1)),0) as "2월"
+     , NVL(SUM(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '03', 1)),0) as "3월"
+     , NVL(SUM(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '04', 1)),0) as "4월"
+     , NVL(SUM(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '05', 1)),0) as "5월"
+     , NVL(SUM(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '06', 1)),0) as "6월"
+     , NVL(SUM(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '07', 1)),0) as "7월"
+     , NVL(SUM(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '08', 1)),0) as "8월"
+     , NVL(SUM(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '09', 1)),0) as "9월"
+     , NVL(SUM(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '10', 1)),0) as "10월"
+     , NVL(SUM(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '11', 1)),0) as "11월"
+     , NVL(SUM(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '12', 1)),0) as "12월"
+  FROM emp e
+ GROUP BY TO_CHAR(e.HIREDATE, 'YYYY')
+ ORDER BY "입사 년도"
+;
+
+SELECT TO_CHAR(e.HIREDATE, 'YYYY')      as "입사 년도"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '01', 1)) as "1월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '02', 1)) as "2월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '03', 1)) as "3월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '04', 1)) as "4월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '05', 1)) as "5월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '06', 1)) as "6월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '07', 1)) as "7월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '08', 1)) as "8월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '09', 1)) as "9월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '10', 1)) as "10월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '11', 1)) as "11월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '12', 1)) as "12월"
+  FROM emp e
+ GROUP BY TO_CHAR(e.HIREDATE, 'YYYY')
+ ORDER BY "입사 년도"
+;
+
+SELECT TO_CHAR(e.HIREDATE, 'YYYY')      as "입사 년도"
+     , DECODE(COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '01', 1))
+            , 0, '-'
+            , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '01', 1))) as "1월"
+     , DECODE(COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '02', 1))
+            , 0, '-'
+            , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '05', 1))) as "2월"
+     , DECODE(COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '03', 1))
+            , 0, '-'
+            , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '03', 1))) as "3월"
+     , DECODE(COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '04', 1))
+            , 0, '-'
+            , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '04', 1))) as "4월"
+     , DECODE(COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '05', 1))
+            , 0, '-'
+            , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '05', 1))) as "5월"
+     , DECODE(COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '06', 1))
+            , 0, '-'
+            , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '06', 1))) as "6월"
+     , DECODE(COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '07', 1))
+            , 0, '-'
+            , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '07', 1))) as "7월"
+     , DECODE(COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '08', 1))
+            , 0, '-'
+            , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '08', 1))) as "8월"
+     , DECODE(COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '09', 1))
+            , 0, '-'
+            , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '09', 1))) as "9월"
+     , DECODE(COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '10', 1))
+            , 0, '-'
+            , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '10', 1))) as "10월"
+     , DECODE(COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '11', 1))
+            , 0, '-'
+            , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '11', 1))) as "11월"
+     , DECODE(COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '12', 1))
+            , 0, '-'
+            , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '12', 1))) as "12월"
+  FROM emp e
+ GROUP BY TO_CHAR(e.HIREDATE, 'YYYY')
+ ORDER BY "입사 년도"
+;
+
+-- 월별 총 입사 인원의 합을 가로로 출력
+SELECT '인원(명)' as "입사 월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '01', 1)) as "1월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '02', 1)) as "2월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '03', 1)) as "3월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '04', 1)) as "4월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '05', 1)) as "5월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '06', 1)) as "6월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '07', 1)) as "7월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '08', 1)) as "8월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '09', 1)) as "9월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '10', 1)) as "10월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '11', 1)) as "11월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '12', 1)) as "12월"
+  FROM emp e
+;
+
+-------------------------- 7. 조인과 서브쿼리
+-- (1) 조인 : JOIN
+----2)
+-- 하나 이상의 테이블을 논리적으로 묶어서 하나의 테이블인 것 처럼 다루는 기술
+-- FROM 절에 조인에 사용할 테이블 이름을 나열
+
+-- 문제) 직원의 부서번호가 아닌 소속 부서명을 알고 싶다.
+SELECT e.ENAME
+     , d.DNAME
+  FROM emp e
+     , dept d
+ WHERE e.DEPTNO = d.DEPTNO -- 오라클의 전통적인 조인 조건 작성 기법
+ ORDER BY d.DEPTNO
+;
+SELECT e.ENAME
+     , d.DNAME
+  FROM emp e
+  JOIN dept d
+    ON e.DEPTNO = d.DEPTNO -- 최근 다른 DBMS들이 사용하고 있는 기법을 오라클에서 지원함
+;
+
+-- 문제) 위의 결과에서 ACCOUNTING 부서의 직원만 알고싶다.
+--       조인 조건과 일반 조건이 같이 사용될 수 있다.
+SELECT e.ENAME
+     , d.DNAME
+  FROM emp e
+     , dept d
+ WHERE e.DEPTNO = d.DEPTNO    -- 조인 조건
+   AND d.DNAME = 'ACCOUNTING' -- 일반 조건
+;
+
+---- 2) 조인 : 카티션 곱 
+--             조인 대상 테이블의 데이터를 가능한 모든 조합으로 엮는 것
+--             조인 조건 누락 시 발생
+--             9i버전 이후 CROSS JOIN 키워드 지원
+
+SELECT e.ENAME 
+     , d.DNAME
+     , s.GRADE
+  FROM emp e CROSS JOIN dept d
+             CROSS JOIN salgrade s
+;
+-- emp 16 x dept 4 x salgrade 5 = 320행 발생
+
+
+---- 3) EQUI JOIN : 조인의 가장 기본
+------- 1. 오라클의 전통적인 WHERE에 조인 조건을 걸어주는 방법
+SELECT e.ENAME
+     , d.DNAME
+  FROM emp e, dept d
+ WHERE e.DEPTNO = d.DEPTNO
+ ORDER BY d.DEPTNO
+;
+
+-------- 2. NATURAL JOIN 키워드로 자동조인
+SELECT e.ENAME
+     , d.DNAME
+  FROM emp e NATURAL JOIN dept d
+;
+
+-------- 3. JOIN ~ USING 키워드로 조인
+SELECT e.ENAME
+     , d.DNAME
+  FROM emp e JOIN dept d USING (deptno)
+;
+
+-------- 4. JOIN ~ ON 키워드로 조인
+SELECT e.ENAME
+     , d.DNAME
+  FROM emp e JOIN dept d ON (e.DEPTNO = d.DEPTNO)
+;
+
+
+-- (2) 서브쿼리
