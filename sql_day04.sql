@@ -273,27 +273,53 @@ SELECT e.JOB
 
 -- 4. 각 월별 입사 인원을 세로로 출력
 --- a) 가로로 출력하는 쿼리
-SELECT '인원(명)' as "입사 월"
-     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '01', 1)) as "1월"
-     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '02', 1)) as "2월"
-     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '03', 1)) as "3월"
-     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '04', 1)) as "4월"
-     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '05', 1)) as "5월"
-     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '06', 1)) as "6월"
-     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '07', 1)) as "7월"
-     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '08', 1)) as "8월"
-     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '09', 1)) as "9월"
-     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '10', 1)) as "10월"
-     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '11', 1)) as "11월"
-     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '12', 1)) as "12월"
+SELECT TO_CHAR(e.HIREDATE, 'YYYY')      as "입사 년도"
+             , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '01', 1)) as "1월"
+             , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '02', 1)) as "2월"
+             , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '03', 1)) as "3월"
+             , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '04', 1)) as "4월"
+             , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '05', 1)) as "5월"
+             , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '06', 1)) as "6월"
+             , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '07', 1)) as "7월"
+             , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '08', 1)) as "8월"
+             , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '09', 1)) as "9월"
+             , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '10', 1)) as "10월"
+             , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '11', 1)) as "11월"
+             , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '12', 1)) as "12월"
   FROM emp e
+ GROUP BY TO_CHAR(e.HIREDATE, 'YYYY')
+ ORDER BY "입사 년도"
 ;
 
+
 --- b) 세로로 출력하는 쿼리
-SELECT TO_CHAR(e.HIREDATE, 'MM') as "입사 월"
-     , COUNT(*) as "입사 인원"
+----- 1) 입사일 데이터에서 월을 추출
+SELECT TO_CHAR(e.HIREDATE, 'FMMM')
   FROM emp e
- GROUP BY TO_CHAR(e.HIREDATE, 'MM')
+;
+----- 2) 입사 월별 인원 => 그룹화 기준 월
+--       인원을 구하는 함수 => COUNT(*)
+SELECT TO_CHAR(e.HIREDATE, 'FMMM') as "입사 월"
+     , COUNT(*)
+  FROM emp e
+ GROUP BY TO_CHAR(e.HIREDATE, 'FMMM')
+;
+----- 3) 입사 월 순으로 정렬
+SELECT TO_CHAR(e.HIREDATE, 'FMMM') as "입사 월"
+     , COUNT(*)||'명' as "인원"
+  FROM emp e
+ GROUP BY TO_CHAR(e.HIREDATE, 'FMMM')
  ORDER BY "입사 월"
 ;
+----- 4) 서브쿼리로 감싸서 정렬시도
+SELECT a."입사 월"||'월' as "입사 월"
+     , a."인원"
+FROM (SELECT TO_NUMBER(TO_CHAR(e.HIREDATE, 'FMMM')) as "입사 월"
+           , COUNT(*)||'명' as "인원"
+        FROM emp e
+       GROUP BY TO_CHAR(e.HIREDATE, 'FMMM')
+       ORDER BY "입사 월") a
+;
+
+
                   
