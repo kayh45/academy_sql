@@ -322,4 +322,92 @@ FROM (SELECT TO_NUMBER(TO_CHAR(e.HIREDATE, 'FMMM')) as "입사 월"
 ;
 
 
-                  
+                
+------------------------------------------------------------------
+-- DDL : DBMS 가 OBJECT (객체)로 관리/인식 하는 대상을
+--       생성, 수정, 삭제하는 언어
+--   생성 : CREATE
+--   수정 : ALTER
+--   삭제 : DROP
+
+-- vs DML
+--   생성 : INSERT
+--   수정 : UPDATE
+--   삭제 : DELETE
+--------------------------------------------------------------------
+/*
+  CREATE | ALTER | DROP {관리할 객체의 타입명}
+  
+  DBMS의 객체들 타입
+  SCHEMA, DOMAIN, TABLE, VIEW, INDEX, SEQUENCE, USER, DATABASE
+*/
+
+CREATE TABLE 테이블이름
+(  컬럼1이름 데이터타입[(길이)] [DEFAULT 기본값] [컬럼의 제약사항]
+ [,컬럼2이름 데이터타입[(길이)] [DEFAULT 기본값] [컬럼의 제약사항]]
+ ...
+ [,컬럼n이름 데이터타입[(길이)] [DEFAULT 기본값] [컬럼의 제약사항]]
+);
+/*
+ 컬럼의 제약사항
+  1. PRIMARY KEY : 이 컬럼에 입력되는 값은 중복되지 않으며
+                   한 행을 유일하게 식별가능한 값으로 설정
+                   NULL 데이터 입력이 불가능한 값이여야 한다.
+  2. FOREIGN KEY : 주로 JOIN 에 사용되는 조건으로
+                   다른 테이블의 PK로 사용되었던 값이 등장
+  3. UNIQUE      : 이 컬럼에 입력되는 값은 중복되지 않음을 보장
+                   NULL일수 있음
+  4. NOT NULL    : 이 컬럼에 입력되는 값의 중복은 상관없으나
+                   NULL 상태는 되지 않도록 보장
+                   
+  ===> PK : UNIQUE + NOT NULL 의 형태라는 것을 알 수 있다.
+*/
+
+-- 예) 아카데미 구성 인원 정보를 저장할 테이블을 정의
+/*
+  테이블 이름: member
+  1. 멤버아이디       : member_id    : 문자 : VARCHAR2 : PK
+  2. 멤버 이름        : member_name  : 문자 : VARCHAR2 : NOT NULL
+  3. 전화번호 뒷자리  : phone        : 문자 : VARCHAR2 
+  4. 시스템 등록일    : reg_date     : 날짜 : DATE
+  5. 사는 곳(동 이름) : address      : 문자 : VARCHAR2
+  6. 좋아하는 숫자    : like_number  : 숫자 : NUMBER
+*/
+
+-- 1. 테이블 생성 구문
+CREATE TABLE member
+(  member_id    VARCHAR2(3)     PRIMARY KEY
+ , member_name  VARCHAR2(15)    NOT NULL
+ , phone        VARCHAR2(4)
+ , reg_date     DATE            DEFAULT sysdate
+ , address      VARCHAR2(30)
+ , like_number  NUMBER
+); -- Table MEMBER이(가) 생성되었습니다.
+
+-- 2. 테이블 삭제 구문
+DROP TABLE 테이블이름;
+
+DROP TABLE member;
+-- Table MEMBER이(가) 삭제되었습니다.
+
+-- 3. 테이블 수정 구문
+/*
+    수정의 종류
+    ---------------
+    1. 컬럼을 추가 : ADD
+    2. 컬럼을 삭제 : DROP COLUMN
+    3. 컬럼을 수정 : MODIFY
+*/
+
+ALTER TABLE 테이블이름 {ADD | DROP COLUMN | MODIFY} ... ;
+
+-- 예) 생성한 member 테이블에 컬럼 2개 추가
+-- 출생 월 : birth_month  : NUMBER
+-- 성별    : gender       : VARCHAR2(1)
+
+ALTER TABLE member ADD
+(  birth_month NUMBER
+ , gender      VARCHAR2(1)
+);
+
+DESC member;
