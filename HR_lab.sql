@@ -1,16 +1,37 @@
 --1. employees 테이블에서 job_id 를 중복 배제하여 조회 하고
 --   job_title 같이 출력
 --19건
-
+SELECT DISTINCT e.JOB_ID
+              , j.JOB_TITLE
+  FROM employees e
+     , jobs j
+ WHERE e.JOB_ID = j.JOB_ID
+;
 
 --2. employees 테이블에서 사번, 라스트네임, 급여, 커미션 팩터,
 --   급여x커미션팩터(null 처리) 조회
 --   커미션 컬럼에 대해 null 값이면 0으로 처리하도록 함
 --107건
+SELECT e.EMPLOYEE_ID                         as "사번"
+     , e.LAST_NAME                           as "라스트네임"
+     , e.SALARY                              as "급여"
+     , NVL(e.COMMISSION_PCT, 0)              as "커미션 팩터"
+     , NVL((e.SALARY * e.COMMISSION_PCT), 0) as "급여x커미션팩터"
+  FROM employees e
+;
  
 --3. employees 테이블에서 사번, 라스트네임, 급여, 커미션 팩터(null 값 처리) 조회
 --   단, 2007년 이 후 입사자에 대하여 조회, 고용년도 순 오름차순 정렬
 --30건
+SELECT e.EMPLOYEE_ID                         as "사번"
+     , e.LAST_NAME                           as "라스트네임"
+     , e.SALARY                              as "급여"
+     , NVL(e.COMMISSION_PCT, 0)              as "커미션 팩터"
+     , NVL((e.SALARY * e.COMMISSION_PCT), 0) as "급여x커미션팩터"
+  FROM employees e
+ WHERE e.HIRE_DATE > TO_DATE('2007-01-01', 'YYYY-MM-DD')
+ ORDER BY e.HIRE_DATE
+;
 
 --4. Finance 부서에 소속된 직원의 목록 조회
 --조인으로 해결
