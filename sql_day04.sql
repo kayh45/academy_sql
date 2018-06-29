@@ -405,9 +405,99 @@ ALTER TABLE 테이블이름 {ADD | DROP COLUMN | MODIFY} ... ;
 -- 출생 월 : birth_month  : NUMBER
 -- 성별    : gender       : VARCHAR2(1)
 
+
+-- 1) ADD
 ALTER TABLE member ADD
 (  birth_month NUMBER
  , gender      VARCHAR2(1)
 );
 
-DESC member;
+-- 예) 수정한 member 테이블에서 like_number 컬럼을 삭제
+-- 2) DROP COLUMN
+ALTER TABLE 테이블이름 DROP COLUMN 컬럼이름;
+ALTER TABLE member DROP COLUMN like_number;
+
+-- 예) 출생월 컬럼을 숫자2 자리까지만으로 제한하도록 수정
+-- 3) MODIFY
+ALTER TABLE 테이블이름 MODIFY 컬럼이름 데이터타입(크기);
+ALTER TABLE member MODIFY birth_month NUMBER(2);
+
+---------------------------------------------------------
+-- 예로 사용할 member 테이블의 최종 형태 작성 구문
+CREATE TABLE member
+(  member_id    VARCHAR2(3)     PRIMARY KEY
+ , member_name  VARCHAR2(15)    NOT NULL
+ , phone        VARCHAR2(4)
+ , reg_date     DATE            DEFAULT sysdate
+ , address      VARCHAR2(30)
+ , like_number  NUMBER
+ , birth_month  NUMBER(2)       
+ , gender       VARCHAR2(1)     CHECK (gender IN ('M', 'F'))
+);
+-- 가장 단순화된 테이블 정의 구문
+-- 제약 조건을 각 컬럼 뒤에 바로 제약조건 이름 없이 생성
+
+-- 테이블 생성시 정의한 제약조건이 저장되는 형태
+-- DDL 로 정의된 제약조건은 시스템 카탈로그에 저장
+-- user_constraint
+
+SELECT u.CONSTRAINT_NAME
+     , u.CONSTRAINT_TYPE
+     , u.TABLE_NAME
+  FROM user_constraints u
+ WHERE u.TABLE_NAME = 'MEMBER'
+;
+
+-- 제약 조건에 이름을 부여해서 생성
+DROP TABLE member;
+CREATE TABLE member
+(  member_id    VARCHAR2(3)     
+ , member_name  VARCHAR2(15)    NOT NULL
+ , phone        VARCHAR2(4)
+ , reg_date     DATE            DEFAULT sysdate
+ , address      VARCHAR2(30)
+ , like_number  NUMBER
+ , birth_month  NUMBER(2)       
+ , gender       VARCHAR2(1)     
+ , CONSTRAINT pk_member         PRIMARY KEY (member_id)
+ , CONSTRAINT ck_member_gender  CHECK (gender IN ('M', 'F'))
+);
+
+
+-- 테이블 생성 기법중 이미 존재하는 테이블로부터 복사 생성
+-- 예) 앞서 생성한 member 테이블을 복사 생성 : new_member
+DROP TABLE new_member;
+CREATE TABLE new_member
+AS
+SELECT *
+  FROM member
+ WHERE 1 = 2 -- 항상 거짓이 되는 조건
+;
+-- ==> PK 설정은 복사되지 않고 테이블 구조만 복사됨
+
+/*
+INSERT INTO "SCOTT"."MEMBER" (MEMBER_ID, MEMBER_NAME, PHONE, ADDRESS, BIRTH_MONTH, GENDER) VALUES ('M01', '유재성', '0238', '용운동', '3', 'M')
+INSERT INTO "SCOTT"."MEMBER" (MEMBER_ID, MEMBER_NAME, PHONE, ADDRESS, BIRTH_MONTH, GENDER) VALUES ('M02', '윤홍식', '4091', '오정동', '12', 'M')
+INSERT INTO "SCOTT"."MEMBER" (MEMBER_ID, MEMBER_NAME, PHONE, ADDRESS, BIRTH_MONTH, GENDER) VALUES ('M03', '윤한수', '9034', '오정동', '8', 'M')
+*/
+
+-- 오정동에 사는 인원의 정보만 복사해서 새 테이블 생성
+-- ojung_member
+DROP TABLE ojung_member;
+CREATE TABLE ojung_member
+AS
+SELECT *
+  FROM member
+ WHERE address = '오정동'
+;
+
+-- 복사할 조건에 항상 참이되는 조건을 주면 모든 데이터를 복사하여 새 테이블 생성
+DROP TABLE full_member;
+CREATE TABLE full_member
+AS
+SELECT *
+  FROM member
+ WHERE 1 = 1 -- 항상 참이 되는 조건
+;
+
+
