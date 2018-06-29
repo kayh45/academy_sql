@@ -500,4 +500,152 @@ SELECT *
  WHERE 1 = 1 -- 항상 참이 되는 조건
 ;
 
+----------------------
+-- 테이블 수정할 때 주의사항
+
+-- 1) 컬럼에 데이터가 없을 때는 타입변경, 크기변경 모두 자유로움
+-- 2) 컬럼에 데이터가 있을 떄 데이터 크기가 동일 혹은 커지는 방향으로만
+--    숫자는 정밀도 증가로만 허용
+-- 3) 기본값(DEFAULT) 설정은 수정 이후 입력 값부터 적용
+
+-- 예)
+-- 오정동에 사는 멤버만 복사한 ojung_member 테이블을 생각해보자
+-- 주소가 '오정동'으로 고정되어도 될 것 같다.
+
+-- 1) 기본 값 설정 전에 멤버 정보 하나 추가 :  address 가 NULL인 데이터
+
+INSERT INTO "SCOTT"."OJUNG_MEMBER" (MEMBER_ID, MEMBER_NAME, PHONE, BIRTH_MONTH, GENDER) VALUES ('M99', '홍길동', '0000', '9', 'M');
+
+-- 2) 홍길동 정보 입력 후 기본 값 설정
+ALTER TABLE ojung_member MODIFY (address DEFAULT '오정동');
+
+-- 3) 기본 값 설정 후 새 멤버 추가
+INSERT INTO "SCOTT"."OJUNG_MEMBER" (MEMBER_ID, MEMBER_NAME, PHONE, BIRTH_MONTH, GENDER) VALUES ('M98', '허균', '9999', '7', 'M');
+
+
+--- 이미 데이터가 들어있는 컬럼의 크기 변경
+-- 예) ojung_member 테이블의 출생월 birth_month 컬럼을 1칸으로 줄이면
+ALTER TABLE ojung_member MODIFY birth_month NUMBER(10, 2);
+-- 숫자 데이터를 확장하는 방식으로 변경성공
+
+-- 예) 출생월 birth_month 를 문자 2자리로 변경
+ALTER TABLE ojung_member MODIFY birth_month VARCHAR2(2);
+-- 데이터를 변경하려면 컬럼에 데이터가 없어야 함.
+
+
+-- (3) 데이터 무결성 제약 조건 처리 방법 4가지
+--- 1. 컬럼 정의할 때 제약 조건 이름 없이 바로 선언
+DROP TABLE main_table;
+CREATE TABLE main_table
+(  id       VARCHAR2(10)        PRIMARY KEY
+ , nickname VARCHAR2(30)        UNIQUE
+ , reg_date DATE                DEFAULT sysdate
+ , gender   VARCHAR2(1)         CHECK (gender IN ('F', 'M'))
+ , message  VARCHAR2(300)       
+);
+
+DROP TABLE sub_table;
+CREATE TABLE sub_table
+(  id       VARCHAR2(10)        REFERENCES main_table(id)
+ , sub_code NUMBER(4)           NOT NULL
+ , sub_name VARCHAR2(30)
+);
+
+-- 생성된 제약조건 확인 쿼리
+SELECT u.CONSTRAINT_NAME
+     , u.CONSTRAINT_TYPE
+  FROM user_constraints u
+ WHERE u.TABLE_NAME IN ('MAIN_TABLE', 'SUB_TABLE')
+;
+
+--- 2. 컬럼 정의할 때 제약 조건 이름 주며 선언
+DROP TABLE main_table;
+CREATE TABLE main_table
+(  id       VARCHAR2(10) CONSTRAINT pk_main_table            PRIMARY KEY
+ , nickname VARCHAR2(30) CONSTRAINT uq_main_table_nick       UNIQUE
+ , reg_date DATE                DEFAULT sysdate
+ , gender   VARCHAR2(1)  CONSTRAINT ck_main_table_gender     CHECK (gender IN ('F', 'M'))
+ , message  VARCHAR2(300)       
+);
+
+DROP TABLE sub_table;
+CREATE TABLE sub_table
+(  id       VARCHAR2(10) CONSTRAINT fk_sub_table    REFERENCES main_table(id)
+ , sub_code NUMBER(4)           NOT NULL
+ , sub_name VARCHAR2(30)
+);
+
+-- 생성된 제약조건 확인 쿼리
+SELECT u.CONSTRAINT_NAME
+     , u.CONSTRAINT_TYPE
+  FROM user_constraints u
+ WHERE u.TABLE_NAME IN ('MAIN_TABLE', 'SUB_TABLE')
+;
+
+--- 3. 컬럼 정의후 제약 조건 따로 선언
+DROP TABLE main_table;
+CREATE TABLE main_table
+(  id       VARCHAR2(10) 
+ , nickname VARCHAR2(30) 
+ , reg_date DATE                DEFAULT sysdate
+ , gender   VARCHAR2(1)  
+ , message  VARCHAR2(300)     
+ , CONSTRAINT pk_main_table            PRIMARY KEY(id)
+ , CONSTRAINT uq_main_table_nick       UNIQUE(nickname)
+ , CONSTRAINT ck_main_table_gender     CHECK (gender IN ('F', 'M'))
+);
+
+DROP TABLE sub_table;
+CREATE TABLE sub_table
+(  id       VARCHAR2(10) 
+ , sub_code NUMBER(4)           NOT NULL
+ , sub_name VARCHAR2(30)
+ , CONSTRAINT fk_sub_table FOREIGN KEY(id)  REFERENCES main_table(id)
+ , CONSTRAINT pk_sub_table PRIMARY KEY(id, sub_code)
+ -- 복합키로 PK를  설정할 때는 제약조건을 따로 설정하는 방법으로만
+);
+
+-- 생성된 제약조건 확인 쿼리
+SELECT u.CONSTRAINT_NAME
+     , u.CONSTRAINT_TYPE
+  FROM user_constraints u
+ WHERE u.TABLE_NAME IN ('MAIN_TABLE', 'SUB_TABLE')
+;
+--- 4. 테이블 정의 후 테이블 수정 (ALTER TABLE) 로 제약조건 추가
+DROP TABLE sub_table;
+DROP TABLE main_table;
+
+-- 제약조건이 없는 테이블 생성
+CREATE TABLE main_table
+(  id       VARCHAR2(10) 
+ , nickname VARCHAR2(30) 
+ , reg_date DATE                DEFAULT sysdate
+ , gender   VARCHAR2(1)  
+ , message  VARCHAR2(300)     
+);
+-- 제약 조건 사후 추가
+ALTER TABLE main_table ADD
+(  CONSTRAINT pk_main_table            PRIMARY KEY(id)
+ , CONSTRAINT uq_main_table_nick       UNIQUE(nickname)
+ , CONSTRAINT ck_main_table_gender     CHECK (gender IN ('F', 'M'))
+);
+
+-- 제약조건이 없는 테이블 생성
+CREATE TABLE sub_table
+(  id       VARCHAR2(10) 
+ , sub_code NUMBER(4)           NOT NULL
+ , sub_name VARCHAR2(30)
+);
+-- 제약 조건 사후 추가
+ALTER TABLE sub_table ADD
+(  CONSTRAINT fk_sub_table FOREIGN KEY(id)  REFERENCES main_table(id)
+ , CONSTRAINT pk_sub_table PRIMARY KEY(id, sub_code)
+);
+
+
+
+
+
+
+
 
