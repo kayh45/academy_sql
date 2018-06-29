@@ -643,8 +643,20 @@ ALTER TABLE sub_table ADD
 );
 
 
+-- 테이블 이름의 변경 : RENAME
+-- ojung_member ==> member_of_ojung
+RENAME ojung_member TO member_of_ojung;
+-- 테이블 이름이 변경되었습니다.
+DESC member_of_ojung;
+RENAME member_of_ojung TO ojung_member;
+DESC ojung_member;
 
+DROP TABLE main_table;
+-- 삭제 안됨
 
+-- 참조 관계에 상관없이 테이블 바로 삭제
+DROP TABLE main_table CASCADE CONSTRAINT;
+-- sub_table 과의 참조 관계가 끊어지며 바로 삭제됨..
 
 
 
