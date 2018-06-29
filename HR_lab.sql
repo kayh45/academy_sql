@@ -35,19 +35,45 @@ SELECT e.EMPLOYEE_ID                         as "사번"
 
 --4. Finance 부서에 소속된 직원의 목록 조회
 --조인으로 해결
-
-
-
+SELECT e.EMPLOYEE_ID
+     , e.FIRST_NAME
+     , e.LAST_NAME
+  FROM employees e
+     , departments d
+ WHERE e.DEPARTMENT_ID = d.DEPARTMENT_ID
+   AND d.DEPARTMENT_NAME = 'Finance'
+;
 --서브쿼리로 해결
-
-
+SELECT e.EMPLOYEE_ID
+     , e.FIRST_NAME
+     , e.LAST_NAME
+  FROM employees e
+ WHERE e.DEPARTMENT_ID = (SELECT d.DEPARTMENT_ID
+                     FROM departments d
+                    WHERE d.DEPARTMENT_NAME = 'Finance')
+;
+/*
+EMPLOYEE_ID, FIRST_NAME, LAST_NAME
+----------------------------------
+108	        Nancy	    Greenberg
+109     	Daniel	    Faviet
+110	        John	    Chen
+111	        Ismael	    Sciarra
+112	        Jose Manuel	Urman
+113	        Luis	    Popp
+*/
 --6건
  
 --5. Steven King 의 직속 부하직원의 모든 정보를 조회
 --14건
 -- 조인 이용
-
-
+SELECT e1.* 
+  FROM employees e1
+     , employees e2
+ WHERE e1.MANAGER_ID = e2.EMPLOYEE_ID
+   AND e2.FIRST_NAME = 'Steven'
+   AND e2.LAST_NAME = 'King'
+;
 -- 서브쿼리 이용
  
 --6. Steven King의 직속 부하직원 중에서 Commission_pct 값이 null이 아닌 직원 목록
