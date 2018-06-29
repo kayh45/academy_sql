@@ -67,7 +67,7 @@ EMPLOYEE_ID, FIRST_NAME, LAST_NAME
 --5. Steven King 의 직속 부하직원의 모든 정보를 조회
 --14건
 -- 조인 이용
-SELECT e1.* 
+SELECT e1.*
   FROM employees e1
      , employees e2
  WHERE e1.MANAGER_ID = e2.EMPLOYEE_ID
@@ -75,19 +75,104 @@ SELECT e1.*
    AND e2.LAST_NAME = 'King'
 ;
 -- 서브쿼리 이용
- 
+SELECT *
+  FROM employees e
+ WHERE e.MANAGER_ID = (SELECT e.EMPLOYEE_ID
+                         FROM employees e
+                        WHERE e.FIRST_NAME = 'Steven'
+                          AND e.LAST_NAME = 'King')
+;
+/*
+EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, HIRE_DATE, JOB_ID, SALARY, COMMISSION_PCT, MANAGER_ID, DEPARTMENT_ID
+-----------------------------------------------------------------------------------------------------------------------------
+101	    Neena	    Kochhar 	NKOCHHAR	515.123.4568	    05/09/21	AD_VP	17000		100	90
+102	    Lex	        De Haan	    LDEHAAN	    515.123.4569	    01/01/13	AD_VP	17000		100	90
+114 	Den	        Raphaely	DRAPHEAL	515.127.4561	    02/12/07	PU_MAN	11000		100	30
+120	    Matthew	    Weiss	    MWEISS	    650.123.1234	    04/07/18	ST_MAN	8000		100	50
+121	    Adam	    Fripp	    AFRIPP	    650.123.2234	    05/04/10	ST_MAN	8200		100	50
+122	    Payam	    Kaufling	PKAUFLIN	650.123.3234	    03/05/01	ST_MAN	7900		100	50
+123	    Shanta	    Vollman	    SVOLLMAN	650.123.4234	    05/10/10	ST_MAN	6500		100	50
+124	    Kevin	    Mourgos	    KMOURGOS	650.123.5234	    07/11/16	ST_MAN	5800		100	50
+145	    John	    Russell	    JRUSSEL	    011.44.1344.429268	04/10/01	SA_MAN	14000	0.4	100	80
+146	    Karen	    Partners	KPARTNER	011.44.1344.467268	05/01/05	SA_MAN	13500	0.3	100	80
+147	    Alberto	    Errazuriz	AERRAZUR	011.44.1344.429278	05/03/10	SA_MAN	12000	0.3	100	80
+148	    Gerald	    Cambrault	GCAMBRAU	011.44.1344.619268	07/10/15	SA_MAN	11000	0.3	100	80
+149	    Eleni	    Zlotkey	    EZLOTKEY	011.44.1344.429018	08/01/29	SA_MAN	10500	0.2	100	80
+201	    Michael	    Hartstein	MHARTSTE	515.123.5555	    04/02/17	MK_MAN	13000		100	20
+*/
+
 --6. Steven King의 직속 부하직원 중에서 Commission_pct 값이 null이 아닌 직원 목록
 --5건
+SELECT e1.EMPLOYEE_ID                        "직원 사번"
+     , e1.FIRST_NAME || ' ' || e1.LAST_NAME  "직원 이름"
+     , e2.EMPLOYEE_ID                        "상사 사번"
+     , e2.FIRST_NAME || ' ' || e2.LAST_NAME  "상사 이름"
+  FROM employees e1
+     , employees e2
+ WHERE e1.MANAGER_ID = e2.EMPLOYEE_ID
+   AND e2.FIRST_NAME = 'Steven'
+   AND e2.LAST_NAME = 'King'
+   AND e1.COMMISSION_PCT IS NOT NULL
+;  
+/*
+직원 사번  직원 이름        상사 사번  상사 이름
+------------------------------------------------
+145	    John Russell	    100	    Steven King
+146	    Karen Partners	    100	    Steven King
+147	    Alberto Errazuriz	100	    Steven King
+148	    Gerald Cambrault	100	    Steven King
+149	    Eleni Zlotkey	    100	    Steven King
+*/
 
 --7. 각 job 별 최대급여를 구하여 출력 job_id, job_title, job별 최대급여 조회
 --19건
+SELECT e.JOB_ID
+     , j.JOB_TITLE
+     , MAX(e.SALARY)
+  FROM employees e
+     , jobs j
+ WHERE e.JOB_ID = j.JOB_ID
+ GROUP BY e.JOB_ID, j.JOB_TITLE, j.JOB_TITLE 
+ ORDER BY 1   
+;
+/*
+JOB_ID,     JOB_TITLE,                  MAX(E.SALARY)
+------------------------------------------------------
+AC_ACCOUNT	Public Accountant	            8300
+AC_MGR	    Accounting Manager	            12008
+AD_ASST	    Administration Assistant	    4400
+AD_PRES	    President	                    24000
+AD_VP	    Administration Vice President	17000
+FI_ACCOUNT	Accountant	                    9000
+FI_MGR	    Finance Manager	                12008
+HR_REP	    Human Resources Representative	6500
+IT_PROG	    Programmer	                    9000
+MK_MAN	    Marketing Manager	            13000
+MK_REP	    Marketing Representative	    6000
+PR_REP	    Public Relations Representative	10000
+PU_CLERK	Purchasing Clerk	            3100
+PU_MAN	    Purchasing Manager	            11000
+SA_MAN	    Sales Manager	                14000
+SA_REP	    Sales Representative	        11500
+SH_CLERK	Shipping Clerk	                4200
+ST_CLERK	Stock Clerk	                    3600
+ST_MAN	    Stock Manager	                8200
+*/
 
 
  
 --8. 각 Job 별 최대급여를 받는 사람의 정보를 출력,
 --  급여가 높은 순서로 출력
 ----서브쿼리 이용
- 
+SELECT e.FIRST_NAME
+     , e.LAST_NAME
+     , e.JOB_ID
+  FROM employees e
+ WHERE e.JOB_ID = (SELECT MAX(e.SALARY)
+                     FROM employees e
+                    GROUP BY e.JOB_ID)
+;
+
 ----join 이용
 
 

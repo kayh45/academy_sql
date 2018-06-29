@@ -88,10 +88,10 @@ J%JONES	CLERK
 -- 실습 6) emp 테이블에서 모든 직원 대상으로 사번, 이름, 상사이름을 출력
 SELECT e1.EMPNO "사번"
      , e1.ENAME "이름"
-     , nvl(e2.ENAME, '-') "상사이름"
+     , NVL((SELECT e.ENAME
+              FROM emp e
+             WHERE e.EMPNO = e1.MGR), '-') as "상사이름"
   FROM emp e1
-     , emp e2
- WHERE e1.MGR = e2.EMPNO(+)
  ORDER BY "사번"
 ;
 /*
