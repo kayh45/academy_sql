@@ -85,7 +85,6 @@ SELECT e.EMPNO
      , dept d
  WHERE e.DEPTNO = d.DEPTNO(+) 
 ;
-
  -- (+) 기호는 오른쪽에 붙이고 이는 NULL 상태로 출력될 테이블을 결정
  -- 전체 데이터를 기준삼는 테이블이 왼쪽이기 때문에 LEFT OUTER JOIN 발생
  
@@ -97,3 +96,204 @@ SELECT e.EMPNO
   FROM emp e LEFT OUTER JOIN dept d
     ON e.DEPTNO = d.DEPTNO
 ;
+
+
+-- 문제) 아직 아무도 배치되지 않은 부서가 있어도
+--       부서를 다 조회하고싶다면
+-- 1. (+) 연산자로 해결
+SELECT e.EMPNO
+     , e.ENAME
+     , e.DEPTNO
+     , '|'
+     , d.DEPTNO
+     , d.DNAME
+  FROM emp e
+     , dept d
+ WHERE e.DEPTNO(+) = d.DEPTNO
+;
+
+-- 2. RIGHT OUTER JOIN ~ ON 으로 해결
+SELECT e.EMPNO
+     , e.ENAME
+     , e.DEPTNO
+     , '|'
+     , d.DEPTNO
+     , d.DNAME
+  FROM emp e RIGHT OUTER JOIN dept d
+    ON e.DEPTNO = d.DEPTNO
+;
+
+-- 문제) 부서 배치가 안된 직원도 보고 싶고
+--       직원이 아직 아무도 없는 부서도 모두 보고싶을때
+--       즉, 양쪽 모두에 존재하는 NULL 값들을 모두 한번에 보고 싶을 때
+
+
+-- 1. (+) 연산자로는 양쪽 아우터 조인 불가능
+SELECT e.EMPNO
+     , e.ENAME
+     , d.DNAME
+  FROM emp e
+     , dept d
+ WHERE e.DEPTNO(+) = d.DEPTNO(+)
+;
+
+-- 2. FULL OUTER JOIN ~ ON 구문으로 지원
+SELECT e.EMPNO
+     , e.ENAME
+     , d.DNAME
+  FROM emp e FULL OUTER JOIN dept d
+    ON e.DEPTNO = d.DEPTNO
+;
+
+---- 6) SELF JOIN : 한 테이블 내에서 자기 자신의 컬럼 끼리 연결하여 새 행을 만드는 기법
+-- 문제) emp 테이블에서 mgr에 해당하는 상사의 이름을 같이 조회하려면
+SELECT e1.EMPNO "직원의 사번"
+     , e1.ENAME "직원의 이름"
+     , e1.MGR   "상사의 사번"
+     , e2.ENAME "상사의 이름"
+  FROM emp e1
+     , emp e2
+ WHERE e1.MGR = e2.EMPNO
+;
+
+-- 상사가 없는 직원도 조회하고 싶다
+-- a) e1 테이블이 기준 => LEFT OUTER JOIN
+-- b) (+) 기호를 오른쪽에 붙인다
+
+SELECT e1.EMPNO "직원의 사번"
+     , e1.ENAME "직원의 이름"
+     , e1.MGR   "상사의 사번"
+     , e2.ENAME "상사의 이름"
+  FROM emp e1
+     , emp e2
+ WHERE e1.MGR = e2.EMPNO(+)
+;
+
+SELECT e1.EMPNO "직원의 사번"
+     , e1.ENAME "직원의 이름"
+     , e1.MGR   "상사의 사번"
+     , e2.ENAME "상사의 이름"
+  FROM emp e1 LEFT OUTER JOIN emp e2
+    ON e1.MGR = e2.EMPNO
+;
+
+-- 부하직원이 없는 직원들 조회
+SELECT e1.EMPNO "직원의 사번"
+     , e1.ENAME "직원의 이름"
+     , e1.MGR   "상사의 사번"
+     , e2.ENAME "상사의 이름"
+  FROM emp e1
+     , emp e2
+ WHERE e1.MGR(+) = e2.EMPNO
+;
+
+SELECT e1.EMPNO "직원의 사번"
+     , e1.ENAME "직원의 이름"
+     , e1.MGR   "상사의 사번"
+     , e2.ENAME "상사의 이름"
+  FROM emp e1 RIGHT OUTER JOIN emp e2
+    ON e1.MGR = e2.EMPNO
+;
+
+
+-- (2) 서브쿼리 : SUB-QUERY
+--                SELECT, FROM, WHERE 절에 사용할 수 있다.
+
+-- 문제) BLAKE와 직무가 동일한 직원의 정보를 조회
+-- 1. BLAKE의 직무를 조회
+SELECT e.JOB
+  FROM emp e
+ WHERE e.ENAME = 'BLAKE'
+;
+-- 2. 1의 결과를 WHERE 조건 절에 사용하는 메인 쿼리 작성
+SELECT e.EMPNO
+     , e.ENAME
+     , e.JOB
+  FROM emp e
+ WHERE e.JOB = (SELECT e.JOB 
+                  FROM emp e
+                 WHERE e.ENAME = 'BLAKE')
+;
+-- => 메인 쿼리의 WHERE 절 ()안에 전달되는 값이 1의 결과인
+--    'MANAGER' 라는 값이다.
+
+-----------------------------------------------------------
+-- 서브쿼리 실습
+-- 1. 이 회사의 평균 급여보다 급여가 큰 직원들의 목록을 조회
+SELECT e.EMPNO
+     , e.ENAME
+     , e.SAL
+  FROM emp e
+ WHERE e.SAL > (SELECT AVG(e.SAL)
+                  FROM emp e)
+;
+
+-- 2. 급여가 평균 급여보다 크면서 사번이 7700번보다 높은 직원조회
+SELECT e.EMPNO
+     , e.ENAME
+     , e.SAL
+  FROM emp e
+ WHERE e.SAL > (SELECT AVG(e.SAL)
+                  FROM emp e)
+   AND e.EMPNO > 7700
+;
+
+-- 3. 각 직무별로 최대 급여를 받는 직원 목록을 조회
+SELECT e1.JOB
+     , e1.EMPNO
+     , e1.ENAME
+     , e1.SAL
+  FROM emp e1
+ WHERE e1.SAL = (SELECT MAX(e.SAL)
+                  FROM emp e               
+                 GROUP BY e.JOB
+                HAVING e.JOB = e1.JOB)
+;
+
+SELECT e1.JOB
+     , e1.EMPNO
+     , e1.ENAME
+     , e1.SAL
+  FROM emp e1
+ WHERE e1.SAL = (SELECT MAX(e.SAL)
+                   FROM emp e
+                  WHERE e.JOB = e1.JOB)                  
+;
+
+SELECT e.JOB
+     , e.EMPNO
+     , e.ENAME
+     , e.SAL
+  FROM emp e
+ WHERE (e.JOB, e.SAL) IN (SELECT e.JOB
+                               , MAX(e.SAL)
+                            FROM emp e               
+                           GROUP BY e.JOB)
+;
+
+-- 4. 각 월별 입사 인원을 세로로 출력
+--- a) 가로로 출력하는 쿼리
+SELECT '인원(명)' as "입사 월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '01', 1)) as "1월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '02', 1)) as "2월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '03', 1)) as "3월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '04', 1)) as "4월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '05', 1)) as "5월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '06', 1)) as "6월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '07', 1)) as "7월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '08', 1)) as "8월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '09', 1)) as "9월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '10', 1)) as "10월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '11', 1)) as "11월"
+     , COUNT(DECODE(TO_CHAR(e.HIREDATE, 'MM'), '12', 1)) as "12월"
+  FROM emp e
+;
+
+--- b) 세로로 출력하는 쿼리
+SELECT TO_CHAR(e.HIREDATE, 'MM') as "입사 월"
+     , COUNT(*) as "입사 인원"
+  FROM emp e
+ GROUP BY TO_CHAR(e.HIREDATE, 'MM')
+ ORDER BY "입사 월"
+;
+                  
