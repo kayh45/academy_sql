@@ -132,7 +132,7 @@ SELECT e.JOB_ID
   FROM employees e
      , jobs j
  WHERE e.JOB_ID = j.JOB_ID
- GROUP BY e.JOB_ID, j.JOB_TITLE, j.JOB_TITLE 
+ GROUP BY e.JOB_ID, j.JOB_TITLE 
  ORDER BY 1   
 ;
 /*
@@ -164,37 +164,151 @@ ST_MAN	    Stock Manager	                8200
 --8. 각 Job 별 최대급여를 받는 사람의 정보를 출력,
 --  급여가 높은 순서로 출력
 ----서브쿼리 이용
-SELECT e.FIRST_NAME
-     , e.LAST_NAME
-     , e.JOB_ID
+SELECT e.JOB_ID
+      , e.FIRST_NAME
+      , e.LAST_NAME
+      , e.SALARY
   FROM employees e
- WHERE e.JOB_ID = (SELECT MAX(e.SALARY)
-                     FROM employees e
-                    GROUP BY e.JOB_ID)
+ WHERE (e.JOB_ID, e.SALARY) IN (SELECT e.JOB_ID
+                                      , MAX(e.SALARY)
+                                  FROM employees e
+                                 GROUP BY e.JOB_ID)
+ ORDER BY e.SALARY
 ;
 
 ----join 이용
+SELECT e1.JOB_ID
+      , e1.FIRST_NAME
+      , e1.LAST_NAME
+      , e1.SALARY
+  FROM employees e1
+      , (SELECT e.JOB_ID
+               , MAX(e.SALARY) "최대 급여"
+            FROM employees e
+           GROUP BY e.JOB_ID) e2                       
+ WHERE e1.JOB_ID = e2.JOB_ID
+   AND e1.SALARY = e2."최대 급여"
+ ORDER BY e1.SALARY
+;
 
-
+/*
+JOB_ID  FIRST_NAME    LAST_NAME      SALARY
+-----------------------------------------
+PU_CLERK	Alexander	Khoo	    3100
+ST_CLERK	Renske	    Ladwig	    3600
+SH_CLERK	Nandita	    Sarchand	4200
+AD_ASST	    Jennifer	Whalen	    4400
+MK_REP	    Pat	Fay	    6000
+HR_REP	    Susan	    Mavris	    6500
+ST_MAN	    Adam	    Fripp	    8200
+AC_ACCOUNT	William	    Gietz	    8300
+IT_PROG	    Alexander	Hunold	    9000
+FI_ACCOUNT	Daniel	    Faviet	    9000
+PR_REP	    Hermann	    Baer	    10000
+PU_MAN	    Den	        Raphaely	11000
+SA_REP	    Lisa	    Ozer	    11500
+FI_MGR	    Nancy	    Greenberg	12008
+AC_MGR	    Shelley	    Higgins	    12008
+MK_MAN	    Michael	    Hartstein	13000
+SA_MAN	    John	    Russell	    14000
+AD_VP	    Neena	    Kochhar	    17000
+AD_VP	    Lex	        De Haan	    17000
+AD_PRES	    Steven	    King	    24000
+*/
 --20건
 
 --9. 7번 출력시 job_id 대신 Job_name, manager_id 대신 Manager의 last_name, department_id 대신 department_name 으로 출력
 --20건
 
+SELECT j.JOB_TITLE       "직무"
+      , e.LAST_NAME       "사원이름"
+      , d.DEPARTMENT_NAME "부서"
+      , e1.LAST_NAME      "상사이름"
+      , e.SALARY          "급여"
+  FROM employees e
+      , employees e1
+      , jobs j
+      , departments d
+ WHERE (e.JOB_ID, e.SALARY) IN (SELECT e.JOB_ID
+                                      , MAX(e.SALARY)
+                                  FROM employees e
+                                 GROUP BY e.JOB_ID)
+   AND e.JOB_ID = j.JOB_ID
+   AND e.DEPARTMENT_ID = d.DEPARTMENT_ID
+   AND e.MANAGER_ID = e1.EMPLOYEE_ID(+)
+ ORDER BY e.SALARY
+;
+/*
+직무, 사원이름, 부서, 상사이름, 급여
+----------------------------------------------------------
+Purchasing Clerk	Khoo	Purchasing	Raphaely	3100
+Stock Clerk	Ladwig	Shipping	Vollman	3600
+Shipping Clerk	Sarchand	Shipping	Fripp	4200
+Administration Assistant	Whalen	Administration	Kochhar	4400
+Marketing Representative	Fay	Marketing	Hartstein	6000
+Human Resources Representative	Mavris	Human Resources	Kochhar	6500
+Stock Manager	Fripp	Shipping	King	8200
+Public Accountant	Gietz	Accounting	Higgins	8300
+Programmer	Hunold	IT	De Haan	9000
+Accountant	Faviet	Finance	Greenberg	9000
+Public Relations Representative	Baer	Public Relations	Kochhar	10000
+Purchasing Manager	Raphaely	Purchasing	King	11000
+Sales Representative	Ozer	Sales	Cambrault	11500
+Finance Manager	Greenberg	Finance	Kochhar	12008
+Accounting Manager	Higgins	Accounting	Kochhar	12008
+Marketing Manager	Hartstein	Marketing	King	13000
+Sales Manager	Russell	Sales	King	14000
+Administration Vice President	Kochhar	Executive	King	17000
+Administration Vice President	De Haan	Executive	King	17000
+President	King	Executive		24000
+*/
+
 
 --10. 전체 직원의 급여 평균을 구하여 출력
-
-
+SELECT AVG(e.SALARY)
+  FROM employees e
+;
 --11. 전체 직원의 급여 평균보다 높은 급여를 받는 사람의 목록 출력. 급여 오름차순 정렬
 --51건
 
+SELECT *
+  FROM employees e
+ WHERE e.SALARY > (SELECT AVG(e.SALARY) "평균 급여"
+                      FROM employees e)
+ ORDER BY e.SALARY 
+;
 --12. 각 부서별 평균 급여를 구하여 출력
 --12건
 
+SELECT AVG(e.SALARY) "평균 급여"
+  FROM employees e
+ GROUP BY e.DEPARTMENT_ID
+;
 --13. 12번의 결과에 department_name 같이 출력
 --12건
-
-
+SELECT d.DEPARTMENT_NAME "부서"
+      , TO_CHAR(AVG(e.SALARY), '$999,999.99') "평균 급여"
+  FROM employees e
+     , departments d
+ WHERE e.DEPARTMENT_ID = d.DEPARTMENT_ID(+)
+ GROUP BY e.DEPARTMENT_ID, d.DEPARTMENT_NAME
+;
+/*
+부서                  평균 급여
+-------------------------------
+Finance	              $8,601.33
+                      $7,000.00
+Shipping	          $3,475.56
+Public Relations	  $10,000.00
+Purchasing	          $4,150.00
+Executive	          $19,333.33
+Administration	      $4,400.00
+Accounting	          $10,154.00
+Human Resources	      $6,500.00
+Marketing	          $9,500.00
+IT	                  $5,760.00
+Sales	              $8,955.88
+*/
 --14. employees 테이블이 각 job_id 별 인원수와 job_title을 같이 출력하고 job_id 오름차순 정렬
 
 
