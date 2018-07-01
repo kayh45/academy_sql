@@ -165,12 +165,12 @@ ST_MAN	    Stock Manager	                8200
 --  급여가 높은 순서로 출력
 ----서브쿼리 이용
 SELECT e.JOB_ID
-      , e.FIRST_NAME
-      , e.LAST_NAME
-      , e.SALARY
+     , e.FIRST_NAME
+     , e.LAST_NAME
+     , e.SALARY
   FROM employees e
  WHERE (e.JOB_ID, e.SALARY) IN (SELECT e.JOB_ID
-                                      , MAX(e.SALARY)
+                                     , MAX(e.SALARY)
                                   FROM employees e
                                  GROUP BY e.JOB_ID)
  ORDER BY e.SALARY
@@ -178,14 +178,14 @@ SELECT e.JOB_ID
 
 ----join 이용
 SELECT e1.JOB_ID
-      , e1.FIRST_NAME
-      , e1.LAST_NAME
-      , e1.SALARY
+     , e1.FIRST_NAME
+     , e1.LAST_NAME
+     , e1.SALARY
   FROM employees e1
-      , (SELECT e.JOB_ID
-               , MAX(e.SALARY) "최대 급여"
-            FROM employees e
-           GROUP BY e.JOB_ID) e2                       
+     , (SELECT e.JOB_ID
+             , MAX(e.SALARY) "최대 급여"
+          FROM employees e
+         GROUP BY e.JOB_ID) e2                       
  WHERE e1.JOB_ID = e2.JOB_ID
    AND e1.SALARY = e2."최대 급여"
  ORDER BY e1.SALARY
@@ -221,16 +221,16 @@ AD_PRES	    Steven	    King	    24000
 --20건
 
 SELECT j.JOB_TITLE       "직무"
-      , e.LAST_NAME       "사원이름"
-      , d.DEPARTMENT_NAME "부서"
-      , e1.LAST_NAME      "상사이름"
-      , e.SALARY          "급여"
+     , e.LAST_NAME       "사원이름"
+     , d.DEPARTMENT_NAME "부서"
+     , e1.LAST_NAME      "상사이름"
+     , e.SALARY          "급여"
   FROM employees e
-      , employees e1
-      , jobs j
-      , departments d
+     , employees e1
+     , jobs j
+     , departments d
  WHERE (e.JOB_ID, e.SALARY) IN (SELECT e.JOB_ID
-                                      , MAX(e.SALARY)
+                                     , MAX(e.SALARY)
                                   FROM employees e
                                  GROUP BY e.JOB_ID)
    AND e.JOB_ID = j.JOB_ID
@@ -271,7 +271,9 @@ SELECT AVG(e.SALARY)
 --11. 전체 직원의 급여 평균보다 높은 급여를 받는 사람의 목록 출력. 급여 오름차순 정렬
 --51건
 
-SELECT *
+SELECT e.EMPLOYEE_ID
+     , e.LAST_NAME
+     , e.SALARY
   FROM employees e
  WHERE e.SALARY > (SELECT AVG(e.SALARY) "평균 급여"
                       FROM employees e)
@@ -291,7 +293,7 @@ SELECT d.DEPARTMENT_NAME "부서"
   FROM employees e
      , departments d
  WHERE e.DEPARTMENT_ID = d.DEPARTMENT_ID(+)
- GROUP BY e.DEPARTMENT_ID, d.DEPARTMENT_NAME
+ GROUP BY d.DEPARTMENT_NAME
 ;
 /*
 부서                  평균 급여
@@ -317,7 +319,8 @@ SELECT e.JOB_ID    "직무번호"
   FROM employees e
       , jobs j
  WHERE e.JOB_ID = j.JOB_ID
- GROUP BY e.JOB_ID, j.JOB_TITle
+ GROUP BY e.JOB_ID
+        , j.JOB_TITle
  ORDER BY e.JOB_ID
 ;
 /*
@@ -346,13 +349,14 @@ ST_MAN	    Stock Manager	                5
 --15. employees 테이블의 job_id별 최저급여,
 --   최대급여를 job_title과 함께 출력 job_id 알파벳순 오름차순 정렬
 SELECT e.JOB_ID         AS "직책번호"
-      , j.JOB_TITLE      AS "직책"
-      , MIN(e.SALARY)   AS "최저급여" 
-      , MAX(e.SALARY)   AS "최대급여"
+     , j.JOB_TITLE      AS "직책"
+     , MIN(e.SALARY)   AS "최저급여" 
+     , MAX(e.SALARY)   AS "최대급여"
   FROM employees e 
   JOIN jobs j
     ON e.JOB_ID = j.JOB_ID
- GROUP BY e.JOB_ID, j.JOB_TITLE
+ GROUP BY e.JOB_ID
+        , j.JOB_TITLE
  ORDER BY e.JOB_ID
 ;
  
@@ -385,11 +389,13 @@ ST_MAN	Stock Manager	5800	8200
 --   해당 job_id 의 job_title 과 그 때 직원의 인원수를 같이 출력
 
 SELECT e.JOB_ID        AS "직무 번호"
-      , J.JOB_TITLE     AS "직무"
-      , COUNT(*)        AS "인원수"
-  FROM EMPLOYEES e, JOBS j
+     , J.JOB_TITLE     AS "직무"
+     , COUNT(*)        AS "인원수"
+  FROM EMPLOYEES e
+     , JOBS j
  WHERE E.JOB_ID = J.JOB_ID 
- GROUP BY e.JOB_ID, J.JOB_TITLE
+ GROUP BY e.JOB_ID
+        , J.JOB_TITLE
 HAVING COUNT(*) = (SELECT MAX(COUNT(*))
                        FROM EMPLOYEES e
                       GROUP BY e.JOB_ID)
@@ -406,22 +412,22 @@ SA_REP	Sales Representative	30
 --  부서 위치 도시(city), 나라(country_name), 지역(region_name) 을 출력
 ----------- 부서가 배정되지 않은 인원 고려 ------
 
-SELECT e.EMPLOYEE_ID      "사번"
-      , e.LAST_NAME          "이름"
-      , e.SALARY             "급여"
-      , j.JOB_TITLE          "직무"
-      , d.DEPARTMENT_NAME    "부서"
-      , e.LAST_NAME          "부서장"
-      , l.CITY               "위치"
-      , c.COUNTRY_NAME       "국가"
-      , r.REGION_NAME        "지역"
+SELECT e.EMPLOYEE_ID        "사번"
+     , e.LAST_NAME          "이름"
+     , e.SALARY             "급여"
+     , j.JOB_TITLE          "직무"
+     , d.DEPARTMENT_NAME    "부서"
+     , e.LAST_NAME          "부서장"
+     , l.CITY               "위치"
+     , c.COUNTRY_NAME       "국가"
+     , r.REGION_NAME        "지역"
   FROM employees e
-      , jobs j
-      , departments d
-      , employees e1
-      , locations l
-      , countries c
-      , regions r
+     , jobs j
+     , departments d
+     , employees e1
+     , locations l
+     , countries c
+     , regions r
  WHERE e.JOB_ID = j.JOB_ID
    AND e.DEPARTMENT_ID = d.DEPARTMENT_ID (+)
    AND d.MANAGER_ID = e1.EMPLOYEE_ID (+)
@@ -433,11 +439,11 @@ SELECT e.EMPLOYEE_ID      "사번"
 
 --18.부서 아이디, 부서명, 부서에 속한 인원숫자를 출력
 SELECT d.DEPARTMENT_ID
-      , d.DEPARTMENT_NAME
-      , (SELECT COUNT(*)
-           FROM employees e
-          WHERE e.DEPARTMENT_ID = d.DEPARTMENT_ID
-          GROUP BY e.DEPARTMENT_ID) AS "인원 수"
+     , d.DEPARTMENT_NAME
+     , (SELECT COUNT(*)
+          FROM employees e
+         WHERE e.DEPARTMENT_ID = d.DEPARTMENT_ID
+         GROUP BY e.DEPARTMENT_ID) AS "인원 수"
   FROM departments d
 ;
 
@@ -445,13 +451,13 @@ SELECT d.DEPARTMENT_ID
 --19.인원이 가장 많은 상위 다섯 부서아이디, 부서명, 인원수 목록 출력
 SELECT *
   FROM (SELECT d.DEPARTMENT_ID
-              , d.DEPARTMENT_NAME
-              , (SELECT COUNT(*)
-                   FROM employees e
-                  WHERE e.DEPARTMENT_ID = d.DEPARTMENT_ID
-                  GROUP BY e.DEPARTMENT_ID) AS "인원 수"                     
+             , d.DEPARTMENT_NAME
+             , (SELECT COUNT(*)
+                  FROM employees e
+                 WHERE e.DEPARTMENT_ID = d.DEPARTMENT_ID
+                 GROUP BY e.DEPARTMENT_ID) AS "인원 수"                     
           FROM departments d
-          ORDER BY "인원 수" DESC) m
+         ORDER BY "인원 수" DESC) m
  WHERE m."인원 수" IS NOT NULL
    AND ROWNUM <= 5
 ;
@@ -517,9 +523,9 @@ SELECT d.DEPARTMENT_ID
 --22. 부서가 가장 많은 도시이름을 출력
 SELECT *
   FROM (SELECT l.CITY   AS "도시 이름"
-              , COUNT(*) AS "부서 수"
+             , COUNT(*) AS "부서 수"
           FROM departments d
-              , locations l
+             , locations l
           WHERE d.LOCATION_ID = l.LOCATION_ID
          GROUP BY l.CITY
          ORDER BY "부서 수" DESC)
@@ -586,9 +592,9 @@ LOCATION_ID, CITY, DEPARTMENT_ID
 --24.평균 급여가 가장 높은 부서명을 출력
 SELECT *
   FROM (SELECT d.DEPARTMENT_NAME                       AS "부서 명"
-                , TO_CHAR(AVG(e.SALARY), '$999,999.99') AS "평균 급여"
+             , TO_CHAR(AVG(e.SALARY), '$999,999.99') AS "평균 급여"
             FROM employees e
-                , departments d
+               , departments d
             WHERE e.DEPARTMENT_ID = d.DEPARTMENT_ID
             GROUP BY d.DEPARTMENT_NAME
             ORDER BY "평균 급여" DESC)
@@ -659,9 +665,9 @@ SELECT e1.EMPLOYEE_ID AS "사번"
 -- 26. 각 부서별 인원수를 출력하되, 인원이 없는 부서는 0으로 나와야 하며
 --     부서는 정식 명칭으로 출력하고 인원이 많은 순서로 정렬.
 SELECT d.DEPARTMENT_NAME       AS "부서 명"
-      , COUNT(e.DEPARTMENT_ID) AS "인원 수"
+     , COUNT(e.DEPARTMENT_ID) AS "인원 수"
   FROM employees e
-      , departments d
+     , departments d
  WHERE e.DEPARTMENT_ID(+) = d.DEPARTMENT_ID
  GROUP BY d.DEPARTMENT_NAME
  ORDER BY "인원 수" DESC
@@ -720,9 +726,9 @@ Americas	            5
 --28. 가장 많은 나라가 등록된 지역명 출력
 SELECT r1."지역 이름"
   FROM (SELECT r.REGION_NAME AS "지역 이름"
-              , count(*)     AS "등록된 나라의 갯수"
+             , count(*)     AS "등록된 나라의 갯수"
           FROM regions r
-              , countries c
+             , countries c
          WHERE r.REGION_ID = c.REGION_ID
          GROUP BY r.REGION_NAME
          ORDER BY "등록된 나라의 갯수" DESC) r1

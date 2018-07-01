@@ -149,3 +149,132 @@ EMPNO   ENAME    JOB        SAL     DNAME        LOC
 8888	J	    CLERK	    400		
 7777	J%JONES	CLERK	    300		
 */
+
+
+-----------------------------------------------------------------
+
+
+-- 실습 1)
+DROP TABLE customer;
+CREATE TABLE customer
+(  userid       VARCHAR2(4)
+ , name         VARCHAR2(30)    NOT NULL
+ , birthyear    NUMBER(4)            
+ , regdate      DATE            DEFAULT(SYSDATE)
+ , address      VARCHAR2(30)
+ , CONSTRAINT pk_customer PRIMARY KEY (userid)
+);
+/*
+Table CUSTOMER이(가) 생성되었습니다.
+*/
+
+-- 실습 2)
+DESC customer;
+/*
+이름        널?       유형            
+--------- -------- ------------- 
+USERID    NOT NULL VARCHAR2(4)  
+NAME      NOT NULL VARCHAR2(20)  
+BIRTHYEAR          NUMBER(4)          
+REGDATE            DATE          
+ADDRESS            VARCHAR2(30) 
+*/
+
+-- 실습 3)
+CREATE TABLE new_cust
+AS
+SELECT *
+  FROM customer
+ WHERE 1 = 0
+;
+/*
+Table NEW_CUST이(가) 생성되었습니다.
+*/
+
+--실습 4)
+DESC new_cust;
+/*
+이름        널?       유형            
+--------- -------- ------------- 
+USERID             VARCHAR2(4)  
+NAME      NOT NULL VARCHAR2(30)  
+BIRTHYEAR          NUMBER          
+REGDATE            DATE          
+ADDRESS            VARCHAR2(30) 
+*/
+
+-- 실습 5)
+CREATE TABLE salesman
+AS
+SELECT *
+  FROM emp e
+ WHERE e.JOB = 'SALESMAN'
+;
+/*
+Table SALESMAN이(가) 생성되었습니다.
+*/
+
+-- 실습 6)
+SELECT * 
+  FROM salesman;
+/*
+EMPNO   ENAME      JOB      MGR     HIREDATE    SAL    COMM   DEPTNO
+-----------------------------------------------------------------------
+7499	ALLEN	SALESMAN	7698	81/02/20	1600	300	    30
+7521	WARD	SALESMAN	7698	81/02/22	1250	500	    30
+7654	MARTIN	SALESMAN	7698	81/09/28	1250	1400	30
+7844	TURNER	SALESMAN	7698	81/09/08	1500	0	    30
+*/
+
+
+-- 실습 7)
+ALTER TABLE customer ADD 
+(  phone    VARCHAR2(11)
+ , grade    VARCHAR2(30)
+ , CONSTRAINT ck_customer_grade CHECK (grade IN ('VIP', 'GOLD', 'SILVER'))
+);
+/*
+Table CUSTOMER이(가) 변경되었습니다.
+*/
+
+-- 실습 8)
+ALTER TABLE customer DROP (grade);
+/*
+Table CUSTOMER이(가) 변경되었습니다.
+*/
+ALTER TABLE customer ADD
+(  grade    VARCHAR2(30)
+ , CONSTRAINT ck_customer_grade CHECK (grade IN('VIP', 'GOLD', 'SILVER'))
+);
+/*
+Table CUSTOMER이(가) 변경되었습니다.
+*/
+DESC customer;
+SELECT uc.CONSTRAINT_NAME
+     , uc.CONSTRAINT_TYPE
+     , uc.TABLE_NAME
+  FROM user_constraints uc
+ WHERE uc.TABLE_NAME = 'CUSTOMER'
+;
+
+
+-- 실습 9)
+ALTER TABLE customer MODIFY
+(  phone    VARCHAR2(4)
+ , userid   VARCHAR2(30)
+);
+/*
+Table CUSTOMER이(가) 변경되었습니다.
+*/
+ALTER TABLE customer MODIFY
+(  userid   number(4)
+);
+/*
+Table CUSTOMER이(가) 변경되었습니다.
+*/
+ALTER TABLE customer MODIFY
+(  userid    VARCHAR2(30)
+);
+/*
+Table CUSTOMER이(가) 변경되었습니다.
+*/
