@@ -311,67 +311,425 @@ Sales	              $8,955.88
 */
 --14. employees 테이블이 각 job_id 별 인원수와 job_title을 같이 출력하고 job_id 오름차순 정렬
 
-
+SELECT e.JOB_ID    "직무번호"
+      , j.JOB_TITLE "직무"
+      , COUNT(*)   "직원 수"
+  FROM employees e
+      , jobs j
+ WHERE e.JOB_ID = j.JOB_ID
+ GROUP BY e.JOB_ID, j.JOB_TITle
+ ORDER BY e.JOB_ID
+;
+/*
+직무번호        , 직무                , 직원 수
+----------------------------------------------
+AC_ACCOUNT	Public Accountant	            1
+AC_MGR	    Accounting Manager	            1
+AD_ASST	    Administration Assistant	    1
+AD_PRES	    President	                    1      
+AD_VP	    Administration Vice President	2
+FI_ACCOUNT	Accountant	                    5
+FI_MGR	    Finance Manager	                1
+HR_REP	    Human Resources Representative	1
+IT_PROG	    Programmer	                    5
+MK_MAN	    Marketing Manager	            1
+MK_REP	    Marketing Representative	    1
+PR_REP	    Public Relations Representative	1
+PU_CLERK	Purchasing Clerk	            5
+PU_MAN	    Purchasing Manager	            1
+SA_MAN	    Sales Manager	                5
+SA_REP	    Sales Representative	        30
+SH_CLERK	Shipping Clerk	                20
+ST_CLERK	Stock Clerk	                    20
+ST_MAN	    Stock Manager	                5
+*/
 --15. employees 테이블의 job_id별 최저급여,
 --   최대급여를 job_title과 함께 출력 job_id 알파벳순 오름차순 정렬
-
-
+SELECT e.JOB_ID         AS "직책번호"
+      , j.JOB_TITLE      AS "직책"
+      , MIN(e.SALARY)   AS "최저급여" 
+      , MAX(e.SALARY)   AS "최대급여"
+  FROM employees e 
+  JOIN jobs j
+    ON e.JOB_ID = j.JOB_ID
+ GROUP BY e.JOB_ID, j.JOB_TITLE
+ ORDER BY e.JOB_ID
+;
  
+/*
+직책번호, 직책, 최저급여, 최대급여
+------------------------------------------------
+AC_ACCOUNT	Public Accountant	8300	8300
+AC_MGR	Accounting Manager	12008	12008
+AD_ASST	Administration Assistant	4400	4400
+AD_PRES	President	24000	24000
+AD_VP	Administration Vice President	17000	17000
+FI_ACCOUNT	Accountant	6900	9000
+FI_MGR	Finance Manager	12008	12008
+HR_REP	Human Resources Representative	6500	6500
+IT_PROG	Programmer	4200	9000
+MK_MAN	Marketing Manager	13000	13000
+MK_REP	Marketing Representative	6000	6000
+PR_REP	Public Relations Representative	10000	10000
+PU_CLERK	Purchasing Clerk	2500	3100
+PU_MAN	Purchasing Manager	11000	11000
+SA_MAN	Sales Manager	10500	14000
+SA_REP	Sales Representative	6100	11500
+SH_CLERK	Shipping Clerk	2500	4200
+ST_CLERK	Stock Clerk	2100	3600
+ST_MAN	Stock Manager	5800	8200
+*/
+
+
 --16. Employees 테이블에서 인원수가 가장 많은 job_id를 구하고
 --   해당 job_id 의 job_title 과 그 때 직원의 인원수를 같이 출력
 
+SELECT e.JOB_ID        AS "직무 번호"
+      , J.JOB_TITLE     AS "직무"
+      , COUNT(*)        AS "인원수"
+  FROM EMPLOYEES e, JOBS j
+ WHERE E.JOB_ID = J.JOB_ID 
+ GROUP BY e.JOB_ID, J.JOB_TITLE
+HAVING COUNT(*) = (SELECT MAX(COUNT(*))
+                       FROM EMPLOYEES e
+                      GROUP BY e.JOB_ID)
+;
 
+/*
+직무 번호,   직무,            인원수
+----------------------------------
+SA_REP	Sales Representative	30
+*/
 
 
 --17.사번,last_name, 급여, 직책이름(job_title), 부서명(department_name), 부서매니저이름
 --  부서 위치 도시(city), 나라(country_name), 지역(region_name) 을 출력
 ----------- 부서가 배정되지 않은 인원 고려 ------
 
+SELECT e.EMPLOYEE_ID      "사번"
+      , e.LAST_NAME          "이름"
+      , e.SALARY             "급여"
+      , j.JOB_TITLE          "직무"
+      , d.DEPARTMENT_NAME    "부서"
+      , e.LAST_NAME          "부서장"
+      , l.CITY               "위치"
+      , c.COUNTRY_NAME       "국가"
+      , r.REGION_NAME        "지역"
+  FROM employees e
+      , jobs j
+      , departments d
+      , employees e1
+      , locations l
+      , countries c
+      , regions r
+ WHERE e.JOB_ID = j.JOB_ID
+   AND e.DEPARTMENT_ID = d.DEPARTMENT_ID (+)
+   AND d.MANAGER_ID = e1.EMPLOYEE_ID (+)
+   AND d.LOCATION_ID  = l.LOCATION_ID (+)
+   AND l.COUNTRY_ID = c.COUNTRY_ID (+) 
+   AND c.REGION_ID = r.REGION_ID (+)
+;
+
 
 --18.부서 아이디, 부서명, 부서에 속한 인원숫자를 출력
-
+SELECT d.DEPARTMENT_ID
+      , d.DEPARTMENT_NAME
+      , (SELECT COUNT(*)
+           FROM employees e
+          WHERE e.DEPARTMENT_ID = d.DEPARTMENT_ID
+          GROUP BY e.DEPARTMENT_ID) AS "인원 수"
+  FROM departments d
+;
 
 
 --19.인원이 가장 많은 상위 다섯 부서아이디, 부서명, 인원수 목록 출력
-
-
+SELECT *
+  FROM (SELECT d.DEPARTMENT_ID
+              , d.DEPARTMENT_NAME
+              , (SELECT COUNT(*)
+                   FROM employees e
+                  WHERE e.DEPARTMENT_ID = d.DEPARTMENT_ID
+                  GROUP BY e.DEPARTMENT_ID) AS "인원 수"                     
+          FROM departments d
+          ORDER BY "인원 수" DESC) m
+ WHERE m."인원 수" IS NOT NULL
+   AND ROWNUM <= 5
+;
+/*
+DEPARTMENT_ID, DEPARTMENT_NAME, 인원 수
+---------------------------------------
+50	            Shipping	        45
+80	            Sales	            34
+30	            Purchasing	        6
+100	            Finance	            6
+60	            IT	                5
+*/
  
 --20. 부서별, 직책별 평균 급여를 구하여라.
 --   부서이름, 직책이름, 평균급여 소수점 둘째자리에서 반올림으로 구하여라.
+SELECT d.DEPARTMENT_NAME                     AS "부서"
+     , j.JOB_TITLE                            AS "직책"
+     , TO_CHAR(AVG(e.SALARY), '$999,999.99') AS "평균 급여"
+  FROM employees e
+     , departments d
+     , jobs j
+ WHERE e.DEPARTMENT_ID = d.DEPARTMENT_ID
+   AND e.JOB_ID = j.JOB_ID
+ GROUP BY d.DEPARTMENT_NAME
+         , j.JOB_TITLE
+ ORDER BY "부서", "직책"
+;
 
-
+/*
+부서,          직책,                평균 급여
+-------------------------------------------------------
+Accounting	Accounting Manager	  $12,008.00
+Accounting	Public Accountant	   $8,300.00
+Administration	Administration Assistant	   $4,400.00
+Executive	Administration Vice President	  $17,000.00
+Executive	President	  $24,000.00
+Finance	Accountant	   $7,920.00
+Finance	Finance Manager	  $12,008.00
+Human Resources	Human Resources Representative	   $6,500.00
+IT	Programmer	   $5,760.00
+Marketing	Marketing Manager	  $13,000.00
+Marketing	Marketing Representative	   $6,000.00
+Public Relations	Public Relations Representative	  $10,000.00
+Purchasing	Purchasing Clerk	   $2,780.00
+Purchasing	Purchasing Manager	  $11,000.00
+Sales	Sales Manager	  $12,200.00
+Sales	Sales Representative	   $8,396.55
+Shipping	Shipping Clerk	   $3,215.00
+Shipping	Stock Clerk	   $2,785.00
+Shipping	Stock Manager	   $7,280.00
+*/
 
 --21.각 부서의 정보를 부서매니저 이름과 함께 출력(부서는 모두 출력되어야 함)
-
-
+SELECT d.DEPARTMENT_ID
+     , d.DEPARTMENT_NAME
+     , d.LOCATION_ID
+     , e.LAST_NAME
+  FROM departments d
+     , employees e
+ WHERE d.MANAGER_ID = e.EMPLOYEE_ID(+)
+;
  
 --22. 부서가 가장 많은 도시이름을 출력
-
-
-
+SELECT *
+  FROM (SELECT l.CITY   AS "도시 이름"
+              , COUNT(*) AS "부서 수"
+          FROM departments d
+              , locations l
+          WHERE d.LOCATION_ID = l.LOCATION_ID
+         GROUP BY l.CITY
+         ORDER BY "부서 수" DESC)
+ WHERE ROWNUM = 1
+;
+/*
+도시 이름, 부서 수
+-----------------
+Seattle	    21
+*/
 --23. 부서가 없는 도시 목록 출력
 --조인사용
-
+SELECT l.LOCATION_ID
+     , l.CITY
+     , d.DEPARTMENT_ID
+  FROM departments d
+     , locations l
+ WHERE d.LOCATION_ID(+) = l.LOCATION_ID
+   AND d.DEPARTMENT_ID IS NULL
+;
 --집합연산 사용
-
+SELECT l.LOCATION_ID
+     , l.CITY
+     , d.DEPARTMENT_ID
+  FROM locations l
+     , departments d
+ WHERE l.LOCATION_ID = d.LOCATION_ID (+)
+MINUS
+SELECT l.LOCATION_ID
+     , l.CITY
+     , d.DEPARTMENT_ID
+  FROM locations l
+     , departments d
+ WHERE l.LOCATION_ID = d.LOCATION_ID
+;
 --서브쿼리 사용
-
-  
+SELECT l.LOCATION_ID
+     , l.CITY
+     , '(null)' as department_id
+  FROM locations l
+ WHERE NOT l.LOCATION_ID IN (SELECT DISTINCT d.LOCATION_ID
+                            FROM departments d)
+;
+/*
+LOCATION_ID, CITY, DEPARTMENT_ID
+-----------------------------------------
+1000	Roma	(null)
+1100	Venice	(null)
+1200	Tokyo	(null)
+1300	Hiroshima	(null)
+1600	South Brunswick	(null)
+1900	Whitehorse	(null)
+2000	Beijing	(null)
+2100	Bombay	(null)
+2200	Sydney	(null)
+2300	Singapore	(null)
+2600	Stretford	(null)
+2800	Sao Paulo	(null)
+2900	Geneva	(null)
+3000	Bern	(null)
+3100	Utrecht	(null)
+3200	Mexico City	(null)
+*/
 --24.평균 급여가 가장 높은 부서명을 출력
+SELECT *
+  FROM (SELECT d.DEPARTMENT_NAME                       AS "부서 명"
+                , TO_CHAR(AVG(e.SALARY), '$999,999.99') AS "평균 급여"
+            FROM employees e
+                , departments d
+            WHERE e.DEPARTMENT_ID = d.DEPARTMENT_ID
+            GROUP BY d.DEPARTMENT_NAME
+            ORDER BY "평균 급여" DESC)
+ WHERE ROWNUM = 1;
+/*
+부서 명        평균 급여
+------------------------
+Executive	  $19,333.33
+*/
 
 
 
 --25. Finance 부서의 평균 급여보다 높은 급여를 받는 직원의 목록 출력
+SELECT AVG(e.SALARY)
+  FROM employees e
+ GROUP BY e.DEPARTMENT_ID
+HAVING e.DEPARTMENT_ID = (SELECT d.DEPARTMENT_ID
+                             FROM departments d
+                            WHERE d.DEPARTMENT_NAME = 'Finance')
+;
+
+SELECT e1.EMPLOYEE_ID AS "사번"
+     , e1.LAST_NAME    AS "이름"
+     , e1.SALARY       AS "급여"
+  FROM employees e1
+ WHERE e1.SALARY > (SELECT AVG(e.SALARY)
+                      FROM employees e
+                     GROUP BY e.DEPARTMENT_ID
+                    HAVING e.DEPARTMENT_ID = (SELECT d.DEPARTMENT_ID
+                                                 FROM departments d
+                                                WHERE d.DEPARTMENT_NAME = 'Finance')    
+                    )
+;
+/*
+사번, 이름, 급여
+--------------------
+100	King	24000
+101	Kochhar	17000
+102	De Haan	17000
+103	Hunold	9000
+108	Greenberg	12008
+109	Faviet	9000
+114	Raphaely	11000
+145	Russell	14000
+146	Partners	13500
+147	Errazuriz	12000
+148	Cambrault	11000
+149	Zlotkey	10500
+150	Tucker	10000
+151	Bernstein	9500
+152	Hall	9000
+156	King	10000
+157	Sully	9500
+158	McEwen	9000
+162	Vishney	10500
+163	Greene	9500
+168	Ozer	11500
+169	Bloom	10000
+170	Fox	9600
+174	Abel	11000
+175	Hutton	8800
+201	Hartstein	13000
+204	Baer	10000
+205	Higgins	12008
+*/
 
 
 -- 26. 각 부서별 인원수를 출력하되, 인원이 없는 부서는 0으로 나와야 하며
 --     부서는 정식 명칭으로 출력하고 인원이 많은 순서로 정렬.
-
+SELECT d.DEPARTMENT_NAME       AS "부서 명"
+      , COUNT(e.DEPARTMENT_ID) AS "인원 수"
+  FROM employees e
+      , departments d
+ WHERE e.DEPARTMENT_ID(+) = d.DEPARTMENT_ID
+ GROUP BY d.DEPARTMENT_NAME
+ ORDER BY "인원 수" DESC
+;
+/*
+부서 명, 인원 수
+-----------------
+Shipping	45
+Sales	34
+Finance	6
+Purchasing	6
+IT	5
+Executive	3
+Marketing	2
+Accounting	2
+Public Relations	1
+Administration	1
+Human Resources	1
+Control And Credit	0
+Shareholder Services	0
+IT Helpdesk	0
+Operations	0
+Payroll	0
+Recruiting	0
+Retail Sales	0
+NOC	0
+Contracting	0
+Corporate Tax	0
+Benefits	0
+Government Sales	0
+Construction	0
+Manufacturing	0
+IT Support	0
+Treasury	0
+*/
 
 
 --27. 지역별 등록된 나라의 갯수 출력(지역이름, 등록된 나라의 갯수)
-
-
+SELECT r.REGION_NAME AS "지역 이름"
+      , count(*)     AS "등록된 나라의 갯수"
+  FROM regions r
+      , countries c
+ WHERE r.REGION_ID = c.REGION_ID
+ GROUP BY r.REGION_NAME
+;
+/*
+지역 이름, 등록된 나라의 갯수
+--------------------------
+Middle East and Africa	6
+Europe	                8
+Asia	                6
+Americas	            5
+*/
 
  
 --28. 가장 많은 나라가 등록된 지역명 출력
+SELECT r1."지역 이름"
+  FROM (SELECT r.REGION_NAME AS "지역 이름"
+              , count(*)     AS "등록된 나라의 갯수"
+          FROM regions r
+              , countries c
+         WHERE r.REGION_ID = c.REGION_ID
+         GROUP BY r.REGION_NAME
+         ORDER BY "등록된 나라의 갯수" DESC) r1
+ WHERE ROWNUM = 1
+;
+/*
+지역이름
+--------
+Europe
+*/
