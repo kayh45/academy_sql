@@ -551,6 +551,138 @@ ROLLBACK;
 
 
 -----------------------------------------------------------------------------
+-- SEQUENCE : 기본 키 등으로 사용되는 일련번호 생성 객체
+
+-- 1. 시작 번호 : 1, 최대 : 30, 사이클이 없는 시퀀스 생성
+CREATE SEQUENCE seq_member_id
+START WITH 1
+MAXVALUE 30
+NOCYCLE
+;
+-- Sequence SEQ_MEMBER_ID이(가) 생성되었습니다.
+
+-- 시퀀스가 생성되면 유저 딕셔너리에 정보가 저장됨 
+--  : user_sequences
+SELECT u.SEQUENCE_NAME
+     , u.MIN_VALUE
+     , u.MAX_VALUE
+     , u.CYCLE_FLAG
+     , u.INCREMENT_BY
+  FROM user_sequences u
+ WHERE u.SEQUENCE_NAME = 'SEQ_MEMBER_ID' 
+;
+/*
+SEQUENCE_NAME | MIN_VALUE | MAX_VALUE | CYCLE_FLAG | INCREMENT_BY
+------------------------------------------------------------------
+SEQ_MEMBER_ID	    1	         30	         N	         1
+*/
+
+-- 사용자의 객체가 저장되는 딕셔너리 테이블
+-- : user_objects
+SELECT o.OBJECT_NAME
+     , o.OBJECT_TYPE
+     , o.OBJECT_ID
+  FROM user_objects o
+;
+
+DESC user_objects;
+
+
+/*-----------------------------------
+  메타 데이터를 저장하는 유저 딕셔너리
+  -----------------------------------
+  무결성 제약조건 : user_constraints
+  시퀀스 생성정보 : user_sequences
+  테이블 생성정보 : user_tables
+  인덱스 생성정보 : user_indexes
+  객체들 생성정보 : user_objects
+------------------------------------*/
+
+-- 2. 생성된 시퀀스 사용
+---- (1) NEXTVAL : 시퀀스의 다음 번호를 생성
+--                 CREATE 되고 나서 반드시 최초에 한번은 NEXTVAL 호출되어야 생성 시작됨
+--        사용법 : 시퀀스이름.NEXTVAL
+SELECT SEQ_MEMBER_ID.NEXTVAL
+  FROM dual
+;
+/*
+MAXVALUE 이상 생성하면
+ORA-08004: sequence SEQ_MEMBER_ID.NEXTVAL exceeds MAXVALUE and cannot be instantiated
+*/
+
+---- (2) CURRVAL : 시퀀스에서 현재 생성된 번호 확인
+--                 시퀀스 생성 후 NEXTVAL 한번도 호출된 적 없으면 비활성화 상태
+--        사용법 : 시퀀스이름.CURRVAL
+SELECT SEQ_MEMBER_ID.CURRVAL
+  FROM dual
+;
+
+CREATE SEQUENCE seq_test
+;
+SELECT seq_test.CURRVAL
+  FROM dual
+;
+/* NEXTVAL 최초 한번 실행 전 CURRVAL를 실행하면 아래와 같은 오류
+ORA-08002: sequence SEQ_TEST.CURRVAL is not yet defined in this session
+*/
 
 
 
+-- 3. 시퀀스 수정 : ALTER SEQUENCE
+--                  생성한 시퀀스 seq_member_id의 MAXVALUE 옵션을 NOMAXVALUE로
+ALTER SEQUENCE seq_member_id
+NOMAXVALUE
+;
+-- Sequence SEQ_MEMBER_ID이(가) 변경되었습니다.
+
+
+-- 4. 시퀀스 삭제 : DROP SEQUENCE
+--                  생성한 시퀀스 seq_member_id 삭제
+DROP SEQUENCE seq_member_id
+;
+
+-- 존재하지 않는 시퀀스에서 CURRVAL 시도
+SELECT SEQ_MEMBER_ID.CURRVAL
+  FROM dual
+;
+/*
+ORA-02289: sequence does not exist
+*/
+
+-- 멤버 아이디에 조합할 시퀀스 신규 생성
+CREATE SEQUENCE seq_member_id
+START WITH 1
+NOMAXVALUE
+NOCYCLE
+;
+
+-- 일괄적으로 증가하는 값을 멤버 아이디로 자동생성
+-- 'M01', 'M02', ... 'M0x' 이런 형태의 값을 조합
+
+SELECT 'M' || LPAD(seq_member_id.NEXTVAL, 2, 0) AS "MEMBER_ID"
+  FROM dual
+;
+
+---------------------------------------------------
+-- INDEX : 데이터 검색(조회)시 일정한 검색 속도를 보장하기 위하여
+--         DBMS가 관리하는 객체
+
+-- 1. user_indexes 딕셔너리에서 검색
+
+SELECT i.INDEX_NAME
+     , i.INDEX_TYPE
+     , i.TABLE_NAME
+     , i.TABLE_OWNER
+     , i.INCLUDE_COLUMN
+  FROM user_indexes i
+;
+
+
+-- 2. 테이블의 주기(PK) 컬럼에 대해서는 이미 DBMS가 자동으로
+--    인덱스 생성함.
+--    따라서 또 생성 시도 시 생성 불가능
+-- 예) member 테이블의 member_id 컬럼에 인덱스 생성 시도
+CREATE INDEX idx_member_id
+ON member (member_id)
+;
+-- ORA-01408: such column list already indexed
