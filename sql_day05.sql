@@ -192,3 +192,140 @@ ORA-00001: unique constraint (SCOTT.PK_MEMBER) violated
 --        논리오류 발생
 INSERT INTO member (member_name, member_id)
 VALUES ('목동', 'M11');
+
+-- 필수 입력 컬럼인 meber_name 누락
+INSERT INTO member (member_id, member_name)
+VALUES ('M12');
+/*
+SQL 오류: ORA-00947: not enough values
+00947. 00000 -  "not enough values"
+*/
+-- 수정
+INSERT INTO member (member_id, member_name)
+VALUES ('M12', '이동희');
+
+-- INTO 절에 나열된 컬럼(3개)과 VALUE 절의 값(2개)의 개수 불일치
+INSERT INTO member (member_id, member_name, gender)
+VALUES ('M13', '유재성');
+/*
+SQL 오류: ORA-00947: not enough values
+00947. 00000 -  "not enough values"
+*/
+
+-- INTO 절에 나열된 컬럼과 VALUES절의 데이터 타입이 불일치
+INSERT INTO member (member_id, member_name, birth_month)
+VALUES ('M13', '유재성', 'M');
+-- 숫자가 들어가는 컬럼에 문자 입력 : ORA-01722: invalid number
+
+--수정
+INSERT INTO member (member_id, member_name, birth_month)
+VALUES ('M13', '유재성', 3);
+
+-------------------------------------------------------------
+-- 다중 행 입력 : SUB-QUERY 를 사용하여 가능
+
+-- 구문 구조
+INSERT INTO 테이블이름
+SELECT 문장;
+
+-- CREATE AS SELECT 는 데이터를 복사하며 테이블 생성
+-- vs.
+-- INSERT INTO ~ SELECT 는 이미 만들어진 테이블에 데이터만 복사 추가
+
+-- member 테이블의 내용을 조회해서 new_member로 insert
+INSERT INTO new_member
+SELECT m.*
+  FROM member m
+ WHERE m.PHONE IS NOT NULL
+;
+-- 5개 행 이(가) 삽입되었습니다.
+
+INSERT INTO new_member
+SELECT m.*
+  FROM member m
+ WHERE m.MEMBER_ID > 'M09'
+;
+-- 4개 행 이(가) 삽입되었습니다.
+-- NEW_MEMBER 테이블 데이터 삭제 X 버튼 클릭 후 -> 데이터 반영
+
+-- 성이 '김'인 멤터 데이터를 복사 입력
+INSERT INTO new_member
+SELECT m.*
+  FROM member m
+ WHERE m.MEMBER_NAME LIKE '김%'
+;
+
+-- 짝수 달에 태어난 멤버데이터를 복사 입력
+INSERT INTO new_member
+SELECT m.*
+  FROM member m
+ WHERE MOD(m.BIRTH_MONTH, 2) = 0 
+;
+
+
+---------------------------------------------------------------
+-- 2) UPDATE : 테이블의 행을 수정
+--              WHERE 조건절의 조합에 따하 1행 혹은 다행 수정이 가능
+
+-- member 테이블에서 이름이 잘못들어간 'M11' 멤버 정보를 수정
+-- 데이터 수정 전에 영구 반영을 실행
+commit;
+
+
+UPDATE member m
+   SET m.MEMBER_NAME = '남정규'
+ WHERE m.MEMBER_ID = 'M11'
+;
+
+-- 'M05' 회원의 전화번호 필드를 업데이트
+commit; -- 커밋 완료'
+
+UPDATE member m
+   SET m.PHONE = '1743'
+-- WHERE m.MEMBER_ID = 'M05'
+;
+-- 13개 행 이(가) 업데이트되었습니다.
+-- WHERE 조건절의 실수로 DML 작업 실수가 발생
+-- 데이터 상태 되돌리기
+rollback; -- 롤백 완료 / 마지막 커밋 상태까지 되돌림
+
+UPDATE member m
+   SET m.PHONE = '1743'
+ WHERE m.MEMBER_ID = 'M05'
+;
+-- 1 행 이(가) 업데이트되었습니다.
+
+-- 2개 이상의 컬럼을 한번에 업데이트 SET 절에 나열
+UPDATE member m
+   SET m.PHONE = '1743'
+     , m.REG_DATE = sysdate
+ WHERE m.MEMBER_ID = 'M05'
+;
+commit;
+
+
+-- '월평동' 사는 '김소민' 멤버의 NULL 업데이트
+UPDATE member m
+   SET m.PHONE = '4724'
+     , m.BIRTH_MONTH = 1
+     , m.GENDER = 'F'
+ WHERE m.ADDRESS = '월평동' 
+ -- m.MEMBER_ID = 'M06'
+;
+-- 위의 실행 결과는 의도대로 반영되는 것 처럼 보이나
+-- 월평동에 사는 사람이 많다면
+-- 월평동의 모든 사람 정보가 수정될 것.
+-- 따라서 UPDATE 구문 작성 시 WHERE 조건은
+-- 주의를 기울여서 작성해야 함.
+
+/* DML : UPDAT, DELETE 작업 시 주의점
+
+   딱 하나의 데이터를 수정/삭제 하려면
+   WHERE 절의 비교 조건에 반드시 PK로 설정함
+   컬럼의 값을 비교하도록 권장.
+   
+   PK는 전체 행에서 유일하고, NOT NULL임이 보장되기 때문.
+   
+   UPDATE, DELETE는 구문에 물리적 오류가 없으면
+   WHERE 조건에 맞는 전체 행 대상으로 작업하는 것이 기본이므로 항상 주의 !!!!
+*/
