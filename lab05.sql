@@ -120,9 +120,22 @@ SEQ_CUST_USERID	        1	        99	        N
 
 
 -- 실습 3)
-CREATE INDEX idx_cust_userid
-    ON customer(userid)
+DROP TABLE new_cust;
+CREATE TABLE new_cust
+AS
+SELECT c.*
+  FROM customer c
+ WHERE 1 = 0
 ;
+-- INDEX가 자동으로 부여되지 않되 테이블 구조를 그대로 사용하기 위해
+-- customer 테이블을 CTAS 구문을 사용하여 복사
+
+CREATE INDEX idx_cust_userid
+    ON new_cust(userid)
+;
+/*
+Index IDX_CUST_USERID이(가) 생성되었습니다.
+*/
 
 
 -- 실습 4)
@@ -136,6 +149,7 @@ SELECT i.INDEX_NAME
 /*
 INDEX_NAME, INDEX_TYPE, TABLE_NAME, TABLE_OWNER, INCLUDE_COLUMN
 -----------------------------------------------------------------
+IDX_CUST_USERID	NORMAL	NEW_CUST	SCOTT	
 PK_EMP	        NORMAL	EMP	        SCOTT	
 PK_DEPT	        NORMAL	DEPT	    SCOTT	
 PK_CUSTOMER 	NORMAL	CUSTOMER	SCOTT	
@@ -149,6 +163,7 @@ SELECT c.TABLE_NAME
 /*
 TABLE_NAME, INDEX_NAME, COLUMN_NAME, COLUMN_POSITION
 ----------------------------------------------------
+NEW_CUST	IDX_CUST_USERID	USERID	    1
 CUSTOMER	PK_CUSTOMER	    USERID	    1
 DEPT	    PK_DEPT	        DEPTNO	    1
 EMP	        PK_EMP	        EMPNO	    1
@@ -162,12 +177,12 @@ SELECT i.INDEX_NAME
      , i.TABLE_OWNER
      , i.INCLUDE_COLUMN
   FROM user_indexes i
- WHERE i.INDEX_NAME = 'PK_CUSTOMER'
+ WHERE i.INDEX_NAME = 'IDX_CUST_USERID'
 ;
 /*
-INDEX_NAME, INDEX_TYPE, TABLE_NAME, TABLE_OWNER, INCLUDE_COLUMN
+INDEX_NAME,     INDEX_TYPE, TABLE_NAME, TABLE_OWNER, INCLUDE_COLUMN
 -----------------------------------------------------------------	
-PK_CUSTOMER 	NORMAL	CUSTOMER	SCOTT	
+IDX_CUST_USERID	    NORMAL	NEW_CUST	SCOTT	
 */
 
 
@@ -177,17 +192,33 @@ SELECT c.TABLE_NAME
      , c.COLUMN_NAME
      , c.COLUMN_POSITION
   FROM user_ind_columns c
- WHERE c.INDEX_NAME = 'PK_CUSTOMER'
+ WHERE c.INDEX_NAME = 'IDX_CUST_USERID'
 ;
 /*
-TABLE_NAME, INDEX_NAME, COLUMN_NAME, COLUMN_POSITION
+TABLE_NAME  INDEX_NAME       COLUMN_NAM  COLUMN_POSITION
 ----------------------------------------------------
-CUSTOMER	PK_CUSTOMER	    USERID	    1
+NEW_CUST	IDX_CUST_USERID	    USERID	        1
 */
 
 -- 실습 7)
+DROP INDEX idx_cust_userid
+;
+/*
+Index IDX_CUST_USERID이(가) 삭제되었습니다.
+*/
+
+
 -- 실습 8)
--- 실습 9)
+SELECT c.TABLE_NAME
+     , c.INDEX_NAME
+     , c.COLUMN_NAME
+     , c.COLUMN_POSITION
+  FROM user_ind_columns c
+ WHERE c.INDEX_NAME = 'IDX_CUST_USERID'
+;
+/*
+    인출된 모든 행 : 0
+*/
 
 ----------------------------------------------------------
 -- PL/SQL
