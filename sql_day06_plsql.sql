@@ -536,3 +536,149 @@ PRINT v_out_number_bind
 EXEC SP_CHNG_NUMBER_FORMAT(out_number => :v_out_number_bind, in_number => 1000)
 PRINT v_out_number_bind
 
+
+-- job별로 경조사비를 급여대비 일정 비율로 지금하고 있다.
+-- 각 직원들의 경조사비 지원금을 구하는 프로시저 작성
+/*
+    CLERK       : 5%
+    SALESMAN    : 4%
+    MANAGER     : 3.7%
+    ANALYST     : 3%
+    PRESIDENT   : 1.5%
+*/
+
+-- (1) SP 이름  : sp_get_tribute_fee
+-- (2) IN 변수  : v_empno (사번타입)
+-- (3) OUT 변수 : v_tribute_fee (급여 타입)
+
+-- 1. 프로시져 작성
+CREATE OR REPLACE PROCEDURE sp_get_tribute_fee
+(  v_empno          IN  EMP.EMPNO%TYPE
+ , v_tribute_fee    OUT EMP.SAL%TYPE)
+IS
+    -- 사번인 직원의 직무를 저장할 지역 변수 선언
+    v_job   EMP.JOB%TYPE;
+    -- 사번인 직원의 급여를 저장할 지역 변수 선언
+    v_sal   EMP.SAL%TYPE;
+    
+BEGIN
+    -- 1. 입력된 사번 직원의 직무를 조회하여 v_job에 저장
+    SELECT e.JOB, e.SAL
+      INTO v_job, v_sal
+      FROM emp e
+     WHERE e.EMPNO = v_empno
+    ;
+    
+    -- 2. 일정 비율로 v_tribute_fee 를 계산
+    IF     v_job = 'CLERK'     THEN v_tribute_fee := v_sal * 0.05;
+    ELSIF  v_job = 'SALSEMAN'  THEN v_tribute_fee := v_sal * 0.04; 
+    ELSIF  v_job = 'MANAGER'   THEN v_tribute_fee := v_sal * 0.037; 
+    ELSIF  v_job = 'ANALYST'   THEN v_tribute_fee := v_sal * 0.03; 
+    ELSIF  v_job = 'PRESIDENT' THEN v_tribute_fee := v_sal * 0.015;
+    END IF
+    ;
+END sp_get_tribute_fee;
+/
+-- 2. 컴파일 / 디버깅
+-- Procedure SP_GET_TRIBUTE_FEE이(가) 컴파일되었습니다.
+
+-- 3. VAR
+VAR v_tribute_fee_bind NUMBER
+
+-- 4. EXEC
+EXEC sp_get_tribute_fee(v_tribute_fee => :v_tribute_fee_bind, v_empno => 7566)
+-- PL/SQL 프로시저가 성공적으로 완료되었습니다.
+
+-- 5. PRINT
+PRINT v_tribute_fee_bind
+
+/*
+V_TRIBUTE_FEE_BIND
+------------------
+            110.08
+*/
+
+
+
+----------------------------------------------------------------------------------------
+-- 2. LOOP 기본 반복문
+----------------------------------------------------------------------------------------
+-- ANONYMOUS PROCEDURE로 실행예
+
+-- 문제 ) 1에서 10까지 합을 출력
+DECLARE
+    -- 1. 초기 값 변수 선언 및 초기화
+    v_init  NUMBER := 0;
+    -- 2. 합산을 저장할 변수
+    v_sum   NUMBER := 0;
+BEGIN
+    LOOP
+        v_init := v_init + 1;
+        v_sum  := v_sum + v_init;
+        
+        DBMS_OUTPUT.PUT_LINE('v_sum : ' || v_sum);
+        
+    -- 반복문 종료 조건
+    EXIT WHEN v_init = 10;
+    END LOOP
+    ;
+    -- 합산 결과 출력
+    DBMS_OUTPUT.PUT_LINE('1 ~ 10 합산 결과 : ' || v_sum);
+END;
+/
+/*
+v_sum : 1
+v_sum : 3
+v_sum : 6
+v_sum : 10
+v_sum : 15
+v_sum : 21
+v_sum : 28
+v_sum : 36
+v_sum : 45
+v_sum : 55
+1 ~ 10 합산 결과 : 55
+
+
+PL/SQL 프로시저가 성공적으로 완료되었습니다.
+*/
+
+
+----------------------------------------------------------------------------------------
+-- 2. LOOP : FOR LOOP 카운터 변수를 사용하는 반복문
+----------------------------------------------------------------------------------------
+-- 지정된 횟수만큼 실행 반복문
+-- 문제) 1 ~ 20 사이의 3의 배수를 출력 : 어나니머스 프로시져
+
+DECLARE
+    -- 1. FOR LOOP 에서 사용할 카운터 변수 선언 / 초기화
+    cnt NUMBER := 0;    
+BEGIN
+    -- 2. LOOP 작성
+    FOR cnt IN 1 .. 20 LOOP
+        -- 3. 3의 배수 판단
+        IF (MOD(cnt, 3) = 0) 
+            THEN DBMS_OUTPUT.PUT_LINE(cnt);
+        END IF
+        ;
+    END LOOP
+    ;
+END;
+/
+
+/*
+3
+6
+9
+12
+15
+18
+
+
+PL/SQL 프로시저가 성공적으로 완료되었습니다.
+*/
+
+
+----------------------------------------------------------------------------------------
+-- 2. LOOP : WHILE LOOP 조건에 따라 수행되는 반복문
+----------------------------------------------------------------------------------------
