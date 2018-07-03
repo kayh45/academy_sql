@@ -65,8 +65,8 @@ V_DATE_BIND
 
 -- 실습 9)
 CREATE OR REPLACE PROCEDURE sp_insert_dept
-(  v_dname    IN    VARCHAR2
- , v_loc      IN    VARCHAR2
+(  v_dname    IN    DEPT.DNAME%TYPE
+ , v_loc      IN    DEPT.LOC%TYPE
 )
 IS
     v_max_deptno    NUMBER;
@@ -117,8 +117,11 @@ DEPTNO   DNAME   LOC
 
 -- 실습 11)
 CREATE OR REPLACE PROCEDURE sp_chng_emp_comm
-()
+(  v_empno  IN  EMP.EMPNO%TYPE )
 IS
+    v_job   EMP.JOB%TYPE;
+    v_comm  EMP.COMM%TYPE;
 BEGIN
+    -- 조건문, UPDATE 처리
 END sp_chng_emp_comm;
 /
