@@ -38,16 +38,13 @@ CREATE OR REPLACE PROCEDURE sp_chng_date_format
 (  v_date   IN OUT VARCHAR2 )
 IS
 BEGIN
-    SELECT TO_CHAR(TO_DATE(v_date, 'YYYY/MM/DD'), 'YYYY Mon dd')
-      INTO v_date
-      FROM dual
-    ;
+    v_date := TO_CHAR(TO_DATE(v_date), 'YYYY Mon dd');
 END sp_chng_date_format;
 /
 
 VAR v_date_bind VARCHAR2(20)
 
-EXEC :v_date_bind := TO_CHAR(sysdate, 'YYYY/MM/DD')
+EXEC :v_date_bind := sysdate
 EXEC sp_chng_date_format(:v_date_bind)
 /*
 PL/SQL 프로시저가 성공적으로 완료되었습니다.
@@ -298,14 +295,208 @@ PL/SQL 프로시저가 성공적으로 완료되었습니다.
 
 -- 실습 15)
 CREATE OR REPLACE FUNCTION fn_emp_sal_avg
-(  v_job        IN  EMP.JOB%TYPE
- , v_sal_avg)   OUT EMP.SAL%TYPE
+(  v_job        IN  EMP.JOB%TYPE )
 RETURN NUMBER
 IS
+    v_sal_avg   EMP.SAL%TYPE;
 BEGIN
-    SELECT 
-      INTO
-      FROM
-     GROUP BY
-    HAVING
+    SELECT ROUND(AVG(e.SAL))
+      INTO v_sal_avg
+      FROM emp e
+     GROUP BY e.JOB
+    HAVING e.JOB = v_job
+    ;    
+    RETURN v_sal_avg;
 END;
+/
+/*
+Function FN_EMP_SAL_AVG이(가) 컴파일되었습니다.
+*/
+
+
+-- 실습 16)
+SELECT fn_emp_sal_avg('SALESMAN') as "평균 급여"
+  FROM dual
+;
+/*
+평균 급여
+---------
+1400
+*/
+
+
+-- 실습 17)
+SELECT e.ENAME AS "직원 이름"
+     , e.SAL   AS "급여"
+  FROM emp e
+ WHERE e.SAL > FN_EMP_SAL_AVG('SALESMAN')
+;
+/*
+직원 이름    급여
+----------------
+ALLEN	    1600
+JONES	    2975
+BLAKE	    2850
+CLARK	    2450
+KING	    5000
+TURNER	    1500
+FORD	    3000
+*/
+
+
+-- 실습 18)
+CREATE OR REPLACE PROCEDURE sp_dept_insert_or_update
+(  v_deptno     IN      DEPT.DEPTNO%TYPE 
+ , v_dname      IN      DEPT.DNAME%TYPE
+ , v_loc        IN      DEPT.LOC%TYPE )
+IS
+BEGIN
+    INSERT INTO dept (deptno, dname, loc)
+    VALUES (v_deptno, v_dname, v_loc)
+    ;
+    DBMS_OUTPUT.PUT_LINE('부서 레코드 추가');
+   
+
+    EXCEPTION
+      WHEN DUP_VAL_ON_INDEX 
+        THEN    UPDATE dept d
+                   SET d.DEPTNO = v_deptno
+                     , d.DNAME  = v_dname
+                     , d.LOC    = v_loc
+                 WHERE d.DEPTNO = v_deptno
+                ;
+        DBMS_OUTPUT.PUT_LINE('부서 레코드 변경');    
+
+END sp_dept_insert_or_update;
+/
+/*
+Procedure SP_DEPT_INSERT_OR_UPDATE이(가) 컴파일되었습니다.
+*/
+EXEC sp_dept_insert_or_update(60, 'QC', 'GUNSAN');
+
+SELECT d.DEPTNO
+     , d.DNAME
+     , d.LOC
+  FROM dept d
+ WHERE d.DEPTNO = 60
+;
+/*
+부서 레코드 추가
+
+PL/SQL 프로시저가 성공적으로 완료되었습니다.
+*/
+/*
+DEPTNO   DNAME   LOC
+----------------------
+60	      QC	GUNSAN
+*/
+
+EXEC sp_dept_insert_or_update(60, 'TEST', 'SEOUL');
+
+SELECT d.DEPTNO
+     , d.DNAME
+     , d.LOC
+  FROM dept d
+ WHERE d.DEPTNO = 60
+;
+/*
+부서 레코드 변경
+
+PL/SQL 프로시저가 성공적으로 완료되었습니다.
+*/
+/*
+DEPTNO   DNAME   LOC
+----------------------
+60	    TEST	SEOUL
+*/
+
+
+-------------------------------------------------------
+-- VIEW
+
+/*
+VIEW 실습에 사용하는 CUSTOMER 테이블에 
+알맞은 데이터가 아무것도 없어서
+EMP 테이블로 대신 하겠습니다....
+*/
+GRANT CREATE VIEW TO SCOTT;
+
+-- 실습 9) emp 테이블에서 직무가 CLERK인 직원의
+--         empno, ename, hiredate 컬럼을 대상으로 VIEW를 생성
+CREATE OR REPLACE VIEW v_emp_clerk
+AS
+SELECT e.EMPNO    AS  "사원번호"
+     , e.ENAME    AS  "사원이름"
+     , e.HIREDATE AS  "입사일"
+  FROM emp e
+ WHERE e.job = 'CLERK'
+;
+/*
+View V_EMP_CLERK이(가) 생성되었습니다.
+*/
+
+
+-- 실습 10)
+SELECT v.*
+  FROM v_emp_clerk v
+;
+/*
+사원번호, 사원이름, 입사일
+-------------------------
+7369	SMITH	80/12/17
+7900	JAMES	81/12/03
+7934	MILLER	82/01/23
+*/
+
+
+DESC USER_VIEWS;
+/*
+이름               널?       유형             
+---------------- -------- -------------- 
+VIEW_NAME        NOT NULL VARCHAR2(30)   
+TEXT_LENGTH               NUMBER         
+TEXT                      LONG           
+TYPE_TEXT_LENGTH          NUMBER         
+TYPE_TEXT                 VARCHAR2(4000) 
+OID_TEXT_LENGTH           NUMBER         
+OID_TEXT                  VARCHAR2(4000) 
+VIEW_TYPE_OWNER           VARCHAR2(30)   
+VIEW_TYPE                 VARCHAR2(30)   
+SUPERVIEW_NAME            VARCHAR2(30)   
+EDITIONING_VIEW           VARCHAR2(1)    
+READ_ONLY                 VARCHAR2(1)    
+*/
+
+
+-- 실습 12)
+SELECT u.view_name
+     , u.text
+  FROM user_views u
+;
+/*
+VIEW_NAME    |       TEXT
+---------------------------------------------
+ V_EMP_CLERK | "SELECT e.EMPNO    AS  "사원번호"
+                     , e.ENAME    AS  "사원이름"
+                     , e.HIREDATE AS  "입사일"
+                  FROM emp e
+                 WHERE e.job = 'CLERK'"
+*/
+
+
+-- 실습 13)
+DROP VIEW v_emp_clerk
+;
+/*
+View V_EMP_CLERK이(가) 삭제되었습니다.
+*/
+
+
+-- 실습 14)
+SELECT u.view_name
+     , u.text
+  FROM user_views u
+;
+/*
+인출된 모든 행 : 0
+*/
