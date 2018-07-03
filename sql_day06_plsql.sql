@@ -390,8 +390,8 @@ BEGIN
          , emp e1
          , dept d
          , salgrade s
-     WHERE e.MGR = e1.EMPNO
-       AND e.DEPTNO = d.DEPTNO
+     WHERE e.MGR = e1.EMPNO(+)
+       AND e.DEPTNO = d.DEPTNO(+)
        AND e.SAL BETWEEN s.LOSAL AND s.HISAL
        AND e.EMPNO = v_empno
     ;
@@ -770,3 +770,110 @@ HAVING AVG(e.SAL) > FN_AVG_SAL_BY_DEPT(30)
 ;
 
 
+------------------------------------------------------------
+-- SP / FN 에서 예외처리
+------------------------------------------------------------
+-- 예외 처리 : 
+
+
+CREATE OR REPLACE PROCEDURE sp_get_emp_info_detail
+(  v_empno      IN      emp.empno%TYPE
+)
+IS
+    -- 1. RECORD 타입 선언
+    TYPE emp_record_type IS RECORD
+    (  r_empno       EMP.EMPNO%TYPE
+     , r_ename       EMP.ENAME%TYPE
+     , r_mgrname     EMP.ENAME%TYPE
+     , r_dname       DEPT.DNAME%TYPE
+     , r_loc         DEPT.LOC%TYPE
+     , r_salgrade    SALGRADE.GRADE%TYPE
+     );
+    -- 2. 1에서 선언한 타입의 변수를 선언
+    v_emp_record    emp_record_type;
+       
+BEGIN
+    SELECT e.EMPNO
+         , e.ENAME
+         , e1.ENAME
+         , d.DNAME
+         , d.LOC
+         , s.GRADE
+      INTO v_emp_record
+      FROM emp e
+         , emp e1
+         , dept d
+         , salgrade s
+     WHERE e.MGR = e1.EMPNO      -- mgr 배정 안된 직원
+       AND e.DEPTNO = d.DEPTNO   -- dept 배정 안된 직원
+       AND e.SAL BETWEEN s.LOSAL AND s.HISAL
+       AND e.EMPNO = v_empno
+    ;
+    DBMS_OUTPUT.PUT_LINE('사 번 : ' || v_emp_record.r_empno);
+    DBMS_OUTPUT.PUT_LINE('이 름 : ' || v_emp_record.r_ename);
+    DBMS_OUTPUT.PUT_LINE('매 니 저 : ' || v_emp_record.r_mgrname);
+    DBMS_OUTPUT.PUT_LINE('부 서 명 : ' || v_emp_record.r_dname);
+    DBMS_OUTPUT.PUT_LINE('부서 위치 : ' || v_emp_record.r_loc);
+    DBMS_OUTPUT.PUT_LINE('급여 등급 : ' || v_emp_record.r_salgrade);
+    
+    -- 5. NO_DATE_FOUND 예외 처리
+    EXCEPTION
+        WHEN NO_DATA_FOUND
+        THEN DBMS_OUTPUT.PUT_LINE('!! 해당 직원의 매니저 혹은 부서가 배정되지 않았습니다. !!');
+       
+END sp_get_emp_info_detail;
+/
+
+EXEC sp_get_emp_info_detail(7839)
+EXEC sp_get_emp_info_detail(6666)
+
+/*
+!! 해당 직원의 매니저 혹은 부서가 배정되지 않았습니다. !!
+PL/SQL 프로시저가 성공적으로 완료되었습니다.
+
+!! 해당 직원의 매니저 혹은 부서가 배정되지 않았습니다. !!
+PL/SQL 프로시저가 성공적으로 완료되었습니다.
+*/
+
+-- 2. DUP_VAL_ON_INDEX
+-- 문제) member 테이블에 member_id, member_name을 
+--       입력 받아서 신규로 1행을 추가하는
+--       sp_insert_member 작성
+
+-- 1. 프로시저 작성
+CREATE OR REPLACE PROCEDURE sp_insert_member
+(  v_member_id   IN member.member_id%TYPE
+ , v_member_name IN MEMBER.MEMBER_NAME%TYPE )
+IS
+BEGIN
+    -- 입력된 IN모드 변수 값을 INSERT 시도
+    INSERT INTO member (member_id, member_name)
+    VALUES (v_member_id, v_member_name)
+    ;
+    COMMIT;
+    -- 처리 내용을 화면 출력
+    DBMS_OUTPUT.PUT_LINE(v_member_id || ' 신규 추가 진행');
+    
+    -- 입력시도에는 항상 DUP_VAL_ON_INDEX 예외 위험 존재
+    EXCEPTION 
+        WHEN DUP_VAL_ON_INDEX
+        THEN -- 이미 종재하는 키의 값이면 신규 추가가 아니라
+             -- 수정으로 진행
+            UPDATE member m
+               SET m.member_name = v_member_name
+             WHERE m.member_id = v_member_id
+            ;
+            -- 처리 내용을 화면 출력
+            DBMS_OUTPUT.PUT_LINE(v_member_id || '가 이미 존재하므로 멤버 정보 수정 진행');
+END sp_insert_member;
+/
+
+-- 2. 컴파일 / 디버깅
+-- Procedure SP_INSERT_MEMBER이(가) 컴파일되었습니다.
+
+-- 3. EXEC
+EXEC sp_insert_member('M13', '유재성');
+
+SELECT m.*
+  FROM member m
+;
