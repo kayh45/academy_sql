@@ -61,3 +61,64 @@ V_DATE_BIND
 --------------------------------------------------------------------------------
 2018 7월  03
 */
+
+
+-- 실습 9)
+CREATE OR REPLACE PROCEDURE sp_insert_dept
+(  v_dname    IN    VARCHAR2
+ , v_loc      IN    VARCHAR2
+)
+IS
+    v_max_deptno    NUMBER;
+BEGIN
+    SELECT MAX(d.deptno)
+      INTO v_max_deptno
+      FROM dept d
+    ;
+    INSERT INTO dept (deptno, dname, loc)
+    VALUES (v_max_deptno + 10, v_dname, v_loc)
+    ;
+    COMMIT;
+END sp_insert_dept;
+/
+/* 프로시저 생성 및 컴파일
+
+Procedure SP_INSERT_DEPT이(가) 컴파일되었습니다.
+*/
+
+-- 실습 10)
+
+-- 위치 전달 방식
+EXEC sp_insert_dept('DESIGN', 'DAEJEON')
+-- 변수명 전달 방식
+EXEC sp_insert_dept(v_loc => 'MUJU', v_dname => 'DEVELOPING')
+/* 
+PL/SQL 프로시저가 성공적으로 완료되었습니다.
+PL/SQL 프로시저가 성공적으로 완료되었습니다.
+*/
+
+SELECT d.DEPTNO
+     , d.DNAME
+     , d.LOC
+  FROM dept d
+;
+/* (3) 등록된 부서 확인
+
+DEPTNO   DNAME   LOC
+------------------------
+10	ACCOUNTING	NEW YORK
+20	RESEARCH	DALLAS
+30	SALES	    CHICAGO
+40	OPERATIONS	BOSTON
+50	DESIGN	    DAEJEON
+60	DEVELOPING	MUJU
+*/
+
+
+-- 실습 11)
+CREATE OR REPLACE PROCEDURE sp_chng_emp_comm
+()
+IS
+BEGIN
+END sp_chng_emp_comm;
+/
