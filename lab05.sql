@@ -317,6 +317,25 @@ BEGIN
     VALUES (v_log_user, v_log_date);    
 END log_execution;
 /
+----------------------------------------------
+-- SELECT INTO 사용
+CREATE OR REPLACE PROCEDURE log_execution
+(  v_log_user   IN  VARCHAR2
+ , v_log_date   OUT VARCHAR2) 
+IS
+BEGIN
+    INSERT INTO log_table
+    VALUES (v_log_user, sysdate)
+    ; 
+    
+    SELECT TO_CHAR(MAX(log_date), 'YYYY-MM-DD HH24:MI:SS')
+      INTO v_log_date
+      FROM log_table l
+     WHERE userid = v_log_user
+    ;
+END log_execution;
+/
+----------------------------------------------
 /*
 Procedure LOG_EXECUTION이(가) 컴파일되었습니다.
 */
@@ -332,8 +351,15 @@ PL/SQL 프로시저가 성공적으로 완료되었습니다. <- EXECUTE 실행�
 V_LOG_DATE                                 <- PRINT 실행시
 --------------------------------------------------------------------------------
 18/07/02
-*/
 
+=================================================================================
+== SELECT INTO 사용
+
+V_LOG_DATE
+--------------------------------------------------------------------------------
+2018-07-03 09:39:45
+
+*/
 
 -- 실습 5)
 --  (1) 프로시져 생성
@@ -362,3 +388,4 @@ PRINT v_month
 
 sql_developer에서는 안나오는데 sql*plus로 실행하니 나오네요..
 */
+
