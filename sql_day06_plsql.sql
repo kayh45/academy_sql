@@ -682,3 +682,91 @@ PL/SQL 프로시저가 성공적으로 완료되었습니다.
 ----------------------------------------------------------------------------------------
 -- 2. LOOP : WHILE LOOP 조건에 따라 수행되는 반복문
 ----------------------------------------------------------------------------------------
+-- 문제) 1 ~ 20 사이의 수 중에서 2의 배수를 화면 출력
+DECLARE
+    cnt NUMBER := 0;
+BEGIN
+    WHILE cnt < 20 LOOP
+    cnt := cnt + 2;
+        DBMS_OUTPUT.PUT_LINE(cnt);        
+    END LOOP
+    ;
+END;
+/
+/*
+2
+4
+6
+8
+10
+12
+14
+16
+18
+20
+
+PL/SQL 프로시저가 성공적으로 완료되었습니다.
+*/
+
+
+-----------------------------------------------------------
+-- PL/SQL : Stored Function (저장 함수)
+-----------------------------------------------------------
+-- 대부분 SP랑 유사
+-- IS 블록 전에 RETURN 구문이 존재
+-- RETURN 구문에는 문장종료기호 (;) 없음
+-- 실행은 기존 사용하는 함수와 동일하게 SELECT, WHERE 절 등에 사용함
+
+-- 문제) 부서 번호를 입력 받아서 해당 부서의 급여 평균을 구하는 함수 작성
+---- (1) FN 이름 : fn_avg_sal_by_dept
+---- (2) IN 변수 : v_deptno (부서번호 타입)
+---- (3) 지역변수 : v_avg_sql (급여 타입) 계산된 평균 급여를 저장
+
+-- 1. 함수 작성
+CREATE OR REPLACE FUNCTION fn_avg_sal_by_dept
+(  v_deptno     IN      DEPT.DEPTNO%TYPE )
+RETURN NUMBER
+IS
+    v_avg_sal   EMP.SAL%TYPE;
+BEGIN
+    -- 부서별 급여 평균을 AVG() 함수를 사용하여 구하고 저장
+    SELECT avg(e.sal)
+      INTO v_avg_sal
+      FROM emp e
+     WHERE e.DEPTNO = v_deptno
+     ;
+     
+     -- 계산 결과를 반올림 하여 리턴
+     RETURN ROUND(v_avg_sal);
+END fn_avg_sal_by_dept;
+/
+
+-- 2. 컴파일 / 디버깅
+-- Function FN_AVG_SAL_BY_DEPT이(가) 컴파일되었습니다.
+
+
+-- 3. 이 함수를 사용하는 쿼리를 작성하여 실행해 본다.
+
+SELECT fn_avg_sal_by_dept(10) as "부서 급여 평균"
+  FROM dual
+;
+/*
+부서 급여 평균
+-------------
+2917
+*/
+SELECT AVG(e.SAL)
+  FROM emp e
+ WHERE e.deptno = 10
+;
+
+
+-- 10번 부서의 급여 평균보다 높은 급여 평균을 받는 부서는?
+SELECT e.DEPTNO
+     , AVG(e.SAL) as "급여 평균"
+  FROM emp e
+ GROUP BY e.DEPTNO
+HAVING AVG(e.SAL) > FN_AVG_SAL_BY_DEPT(30)
+;
+
+
