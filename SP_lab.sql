@@ -81,9 +81,67 @@ PK_CUSTOMER	            P	    CUSTOMER	SCOTT
 */
  
 --2. Sequence DDL 작성 : seq_cust_userid
+CREATE SEQUENCE seq_cust_userid
+START WITH 1
+NOCYCLE
+;
+
 
 --3. procedure 작성 : sp_insert_customer
+CREATE OR REPLACE PROCEDURE sp_insert_customer
+(  v_name       IN          CUSTOMER.NAME%TYPE
+ , v_address    IN          CUSTOMER.ADDRESS%TYPE
+ , v_phone      IN          CUSTOMER.PHONE%TYPE
+ , v_msg        OUT         VARCHAR2
+)
+IS
+    v_nextid   NUMBER;
+BEGIN   
+    SELECT seq_cust_userid.NEXTVAL
+      INTO v_nextid
+      FROM dual
+    ;
+    
+    INSERT INTO customer (userid, name, address, phone)
+    VALUES ('C' || LPAD(v_nextid, 3, '0'), v_name, v_address, v_phone)   
+    ;
+    
+    COMMIT;
+    
+    v_msg := (('C' || LPAD(v_nextid, 3, '0')) || ', ' || v_name || ' 정보 추가');
+    
+END sp_insert_customer;
+/
 
 --4. procedure 실행 코드
 
+VAR v_msg_bind VARCHAR2(100);
+EXEC sp_insert_customer(v_name => '강현', v_address => '홍도동', v_phone => '010-8594-1743' , v_msg => :v_msg_bind);
+EXEC sp_insert_customer(v_name => '박길수', v_address => '둔산동', v_phone => '010-1234-5678' , v_msg => :v_msg_bind);
+EXEC sp_insert_customer(v_name => '이주영', v_address => '용전동', v_phone => '010-5432-7878' , v_msg => :v_msg_bind);
+PRINT v_msg_bind;
+
+SELECT c.USERID
+     , c.NAME
+     , c.ADDRESS
+     , c.PHONE
+     , c.REGDATE
+     , c.UPDATEDT
+  FROM customer c
+;
+
+SHOW errors
+
+
 --5. SELECT * FROM customer; 실행결과 text 캡쳐
+SELECT *
+  FROM customer
+;
+
+/*
+USERID   NAME  BIRTHYEAR  ADDRESS       PHONE        GRADE   REGDATE   UPDATEDT
+--------------------------------------------------------------------------------
+C001	강현	(null)     홍도동	010-8594-1743	SILVER	18/07/06	18/07/06
+C002	박길수	(null)     둔산동	010-1234-5678	SILVER	18/07/06	18/07/06
+C004	이주영	(null)     용전동	010-5432-7878	SILVER	18/07/06	18/07/06
+*/
